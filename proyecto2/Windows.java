@@ -132,7 +132,12 @@ public class Windows extends JFrame implements ActionListener {
             contentPanel.add(new NavegadorPanel(), "navegador");
             cardActual.show(contentPanel, "navegador");
         } 
+        else if (e.getSource() == visor) {
+            contentPanel.add(new VisorPanel(), "VisorImagenes");
+            cardActual.show(contentPanel, "VisorImagenes");
+        } 
         else if (e.getSource() == ig) {
+           // contentPanel.add(new Instagram(), "VisorImagenes");
             cardActual.show(contentPanel, "instagram");
         } 
     }
@@ -167,6 +172,16 @@ public class Windows extends JFrame implements ActionListener {
             add(navegador, BorderLayout.CENTER);
             revalidate();
             repaint(); 
+        }
+    }
+    
+    class VisorPanel extends JPanel {
+        VisorPanel(){
+        setLayout(new BorderLayout());
+        VisorImagenes frame = new VisorImagenes(userManager);
+            add(frame, BorderLayout.CENTER);
+            revalidate();
+            repaint();
         }
     }
     /*
