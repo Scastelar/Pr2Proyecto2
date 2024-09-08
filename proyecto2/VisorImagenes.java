@@ -50,6 +50,7 @@ public class VisorImagenes extends JPanel implements ActionListener {
         anterior.setSize(70, 70);        
         anterior.setBorderPainted(false);
         anterior.setBackground(new Color(255, 249, 249));
+        anterior.setFocusPainted(false);
         setImageLabel(anterior,"src\\imgs\\anterior.jpg");
         anterior.addActionListener(this);
         buttonPanel.add(anterior);
@@ -58,6 +59,7 @@ public class VisorImagenes extends JPanel implements ActionListener {
         siguiente.setSize(70,70);
         siguiente.setBorderPainted(false);
         siguiente.setBackground(new Color(255, 249, 249));
+        siguiente.setFocusPainted(false);
         setImageLabel(siguiente,"src\\imgs\\siguiente.jpg");
         siguiente.addActionListener(this);
         buttonPanel.add(siguiente);
