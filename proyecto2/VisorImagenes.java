@@ -11,15 +11,15 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.border.EmptyBorder;
 
-public class VisorImagenes extends JPanel {
+public class VisorImagenes extends JPanel implements ActionListener {
 
     private UserManager userManager;
     private User currentUser;
     private JLabel titulo = new JLabel("Visor de Imagenes", SwingConstants.CENTER);
     private JLabel imageLabel;
-    private JButton previousButton;
-    private JButton nextButton;
-    private List<File> imageFiles;
+    private JButton anterior;
+    private JButton siguiente;
+    private List<File> imagenes;
     private int currentIndex;
 
     public VisorImagenes(UserManager userManager) {
@@ -46,28 +46,43 @@ public class VisorImagenes extends JPanel {
         buttonPanel.setBackground(new Color(255, 249, 249));
         add(buttonPanel, BorderLayout.SOUTH);
 
-        previousButton = new JButton("Anterior");
-        previousButton.addActionListener(new PreviousImageActionListener());
-        buttonPanel.add(previousButton);
+        anterior = new JButton();
+        anterior.setSize(70, 70);        
+        anterior.setBorderPainted(false);
+        anterior.setBackground(new Color(255, 249, 249));
+        setImageLabel(anterior,"src\\imgs\\anterior.jpg");
+        anterior.addActionListener(this);
+        buttonPanel.add(anterior);
 
-        nextButton = new JButton("Siguiente");
-        nextButton.addActionListener(new NextImageActionListener());
-        buttonPanel.add(nextButton);
+        siguiente = new JButton();
+        siguiente.setSize(70,70);
+        siguiente.setBorderPainted(false);
+        siguiente.setBackground(new Color(255, 249, 249));
+        setImageLabel(siguiente,"src\\imgs\\siguiente.jpg");
+        siguiente.addActionListener(this);
+        buttonPanel.add(siguiente);
 
-        // Cargar imágenes
-        loadImagesFromDirectory("Z\\Users\\" + currentUser.getUsername() + "\\Mis Imagenes");
+        // Cargar imágenes del usuario actual
+        cargarImagenes("Z\\Users\\" + currentUser.getUsername() + "\\Mis Imagenes");
         displayImage(currentIndex);
         setVisible(true);
     }
+    
+    private void setImageLabel(JButton name, String root) {
+        ImageIcon image = new ImageIcon(root);
+        Icon icon = new ImageIcon(image.getImage().getScaledInstance(name.getWidth(), name.getHeight(), Image.SCALE_DEFAULT));
+        name.setIcon(icon);
+        this.repaint();
+    }
 
-    private void loadImagesFromDirectory(String directoryPath) {
+    private void cargarImagenes(String directoryPath) {
         File dir = new File(directoryPath);
         if (dir.isDirectory()) {
             File[] files = dir.listFiles((d, name) -> name.endsWith(".jpg") || name.endsWith(".png") || name.endsWith(".jpeg"));
             if (files != null) {
-                imageFiles = new ArrayList<>();
+                imagenes = new ArrayList<>();
                 for (File file : files) {
-                    imageFiles.add(file);
+                    imagenes.add(file);
                 }
                 currentIndex = 0;
             }
@@ -75,42 +90,43 @@ public class VisorImagenes extends JPanel {
     }
 
     private void displayImage(int index) {
-        if (index >= 0 && index < imageFiles.size()) {
+        if (index >= 0 && index < imagenes.size()) {
             try {
-                Image image = ImageIO.read(imageFiles.get(index));
+                Image image = ImageIO.read(imagenes.get(index));
                 ImageIcon imageIcon = new ImageIcon(image.getScaledInstance(800, 600, Image.SCALE_SMOOTH));
                 imageLabel.setIcon(imageIcon);
             } catch (IOException e) {
                 e.printStackTrace();
-            } catch (NullPointerException e){
+            } catch (NullPointerException e) {
                 JOptionPane.showMessageDialog(null, "No hay imagenes disponibles");
                 System.out.println("No hay Imagenes disponibles");
             }
         }
     }
 
-    private class PreviousImageActionListener implements ActionListener {
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (anterior == e.getSource()) {
+            botonAnterior();
+        }
+        if (siguiente == e.getSource()) {
+            botonSiguiente();
+        }
 
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            if (imageFiles != null && currentIndex > 0) {
-                currentIndex--;
-                displayImage(currentIndex);
-            }
+    }
+
+    public void botonAnterior() {
+        if (imagenes != null && currentIndex > 0) {
+            currentIndex--;
+            displayImage(currentIndex);
         }
     }
 
-    private class NextImageActionListener implements ActionListener {
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            if (imageFiles != null && currentIndex < imageFiles.size() - 1) {
-                currentIndex++;
-                displayImage(currentIndex);
-            }
+    public void botonSiguiente() {
+        if (imagenes != null && currentIndex < imagenes.size() - 1) {
+            currentIndex++;
+            displayImage(currentIndex);
         }
     }
-    
-    
 
 }
