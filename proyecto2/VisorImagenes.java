@@ -6,25 +6,28 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
-import javax.imageio.ImageIO;
 import java.util.ArrayList;
 import java.util.List;
+import javax.imageio.ImageIO;
 import javax.swing.border.EmptyBorder;
 
 public class VisorImagenes extends JPanel implements ActionListener {
-
     private UserManager userManager;
     private User currentUser;
-    private JLabel titulo = new JLabel("Visor de Imagenes", SwingConstants.CENTER);
+    private JLabel titulo = new JLabel("Visor de Imágenes", SwingConstants.CENTER);
     private JLabel imageLabel;
     private JButton anterior;
     private JButton siguiente;
+    private JButton seleccionarCarpeta;
     private List<File> imagenes;
     private int currentIndex;
+    private final File rootDirectory; // Directorio raíz para la selección de carpetas
 
     public VisorImagenes(UserManager userManager) {
         this.userManager = userManager;
         this.currentUser = userManager.getCurrentUser();
+        this.rootDirectory = new File("Z\\Users\\");
+
         setPreferredSize(new Dimension(730, 480));
         setLayout(new BorderLayout());
         setBackground(new Color(255, 249, 249));
@@ -47,25 +50,40 @@ public class VisorImagenes extends JPanel implements ActionListener {
         add(buttonPanel, BorderLayout.SOUTH);
 
         anterior = new JButton();
-        anterior.setSize(70, 70);        
+        anterior.setSize(70, 70);
         anterior.setBorderPainted(false);
         anterior.setBackground(new Color(255, 249, 249));
         anterior.setFocusPainted(false);
-        setImageLabel(anterior,"src\\imgs\\anterior.jpg");
+        setImageLabel(anterior, "src\\imgs\\anterior.jpg");
         anterior.addActionListener(this);
         buttonPanel.add(anterior);
 
         siguiente = new JButton();
-        siguiente.setSize(70,70);
+        siguiente.setSize(70, 70);
         siguiente.setBorderPainted(false);
         siguiente.setBackground(new Color(255, 249, 249));
         siguiente.setFocusPainted(false);
-        setImageLabel(siguiente,"src\\imgs\\siguiente.jpg");
+        setImageLabel(siguiente, "src\\imgs\\siguiente.jpg");
         siguiente.addActionListener(this);
         buttonPanel.add(siguiente);
 
-        // Cargar imágenes del usuario actual
-        cargarImagenes("Z\\Users\\" + currentUser.getUsername() + "\\Mis Imagenes");
+        seleccionarCarpeta = new JButton("Seleccionar Carpeta de Imágenes");
+        seleccionarCarpeta.setForeground(Color.white);
+        seleccionarCarpeta.setBackground(new Color(242, 191, 191));
+        seleccionarCarpeta.addActionListener(this);
+        /*
+        if (!currentUser.getUsername().equals("admin")) {
+           seleccionarCarpeta.setVisible(false);
+        }
+        */
+        
+        buttonPanel.add(seleccionarCarpeta);
+
+        // Cargar imágenes del directorio por defecto del usuario actual
+        cargarImagenes("Z\\Users\\" + currentUser.getUsername());
+        if (currentUser.getUsername().equals("admin")) {
+            cargarImagenes("Z\\Users\\");
+        }
         displayImage(currentIndex);
         setVisible(true);
     }
@@ -100,8 +118,27 @@ public class VisorImagenes extends JPanel implements ActionListener {
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (NullPointerException e) {
-                JOptionPane.showMessageDialog(null, "No hay imagenes disponibles");
-                System.out.println("No hay Imagenes disponibles");
+                JOptionPane.showMessageDialog(null, "No hay imágenes disponibles");
+                System.out.println("No hay Imágenes disponibles");
+            }
+        }
+    }
+
+    private void seleccionarCarpeta() {
+        System.out.println("Usuario actual:"+currentUser.getUsername());
+        JFileChooser fileChooser = new JFileChooser("C:\\Users\\compu\\Documents\\NetBeansProjects\\Proyecto2\\Z\\Users\\" + currentUser.getUsername());
+        if (currentUser.getUsername().equals("admin")) {
+         fileChooser = new JFileChooser(rootDirectory );
+        }
+        fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        fileChooser.setAcceptAllFileFilterUsed(false);
+
+        int result = fileChooser.showOpenDialog(this);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            File selectedDirectory = fileChooser.getSelectedFile();
+            if (selectedDirectory != null && selectedDirectory.isDirectory()) {
+                cargarImagenes(selectedDirectory.getAbsolutePath());
+                displayImage(currentIndex);
             }
         }
     }
@@ -111,10 +148,12 @@ public class VisorImagenes extends JPanel implements ActionListener {
         if (anterior == e.getSource()) {
             botonAnterior();
         }
-        if (siguiente == e.getSource()) {
+        else if (siguiente == e.getSource()) {
             botonSiguiente();
+        } 
+        else if (seleccionarCarpeta == e.getSource()){
+            seleccionarCarpeta();
         }
-
     }
 
     public void botonAnterior() {
@@ -130,5 +169,4 @@ public class VisorImagenes extends JPanel implements ActionListener {
             displayImage(currentIndex);
         }
     }
-
 }

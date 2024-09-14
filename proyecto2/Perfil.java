@@ -51,16 +51,16 @@ public class Perfil extends JPanel implements ActionListener {
         titulo.setMaximumSize(new Dimension(120, 50));
         
         usuario.setFont(new Font("Trebuchet MS", Font.BOLD, 25));
-        usuario.setForeground(new Color(255, 105, 180)); // Color rosa más suave
+        usuario.setForeground(new Color(255, 105, 180)); 
         usuario.setBackground(Color.white);
-        usuario.setMaximumSize(new Dimension(250, 40)); // Aumenta el tamaño para mejor visualización
-        usuario.setHorizontalAlignment(JTextField.CENTER); // Centra el texto dentro del campo
-        usuario.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, Color.pink)); // Borde inferior rosa
+        usuario.setMaximumSize(new Dimension(250, 40)); 
+        usuario.setHorizontalAlignment(JTextField.CENTER);
+        usuario.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, Color.pink)); 
         usuario.setText(usuarioActual.getUsername());
         usuario.setEditable(false);
         
         if (usuarioActual.getUsername()!="admin"){
-          crear.setEnabled(false);
+          crear.setVisible(false);
         } else {
           crear.setEnabled(true);
             

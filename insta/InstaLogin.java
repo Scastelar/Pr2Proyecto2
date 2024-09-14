@@ -1,158 +1,137 @@
-package Insta;
-import insta.IgCuentas;
-import insta.InstaSignup;
-import java.awt.Color;
-import java.awt.GridBagLayout;
-import java.awt.Image;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPasswordField;
-import javax.swing.JTextField;
-import javax.swing.WindowConstants;
+package insta;
 
-public class InstaLogin extends JFrame implements ActionListener{
-    JLabel perfilImg = new JLabel();
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+
+public class InstaLogin extends JPanel implements ActionListener {
+    JLabel logoLabel = new JLabel();
     JLabel image = new JLabel();
-    JLabel signupLabel = new JLabel("¿No tienes cuenta?");
-    JTextField usuarioTxt = new JTextField("Ingrese usuario");  
-    JPasswordField passwordTxt = new JPasswordField("Ingrese contraseña"); 
+    JTextField usuarioTxt = new JTextField();
+    JPasswordField passwordTxt = new JPasswordField();
     JButton login = new JButton("login");
-    JButton signup = new JButton("Sign up");
-    private JPanel mainPanel;
+    JButton signup = new JButton("Crear nueva cuenta");
+    JPanel contentPanel = new JPanel(new CardLayout());
+    private JPanel mainPanel = new JPanel(new BorderLayout());
+    IgCuentas cuentas;
+    private String cuenta, password;
 
     public InstaLogin() {
-        setSize(730, 480);
-        setTitle("Instagram");
-        mainPanel = new JPanel(new GridBagLayout());
-        mainPanel.setLayout(null);
+        cuentas = new IgCuentas();
+        this.contentPanel.setPreferredSize(new Dimension(730, 550));
+        contentPanel.setBackground(Color.white);
+
         mainPanel.setBackground(Color.white);
 
-        image.setBounds(70, 70, 250, 300);
-        setImageLabel(image, "src\\imgs\\gatti.jpg");
-        mainPanel.add(image);
-        
-        perfilImg.setBounds(370, 60, 220, 85);
-        setImageLabel(perfilImg, "src\\imgs\\Instagram_logo.svg.png");
-        mainPanel.add(perfilImg);
+        JPanel leftPanel = new JPanel();
+        leftPanel.setBackground(Color.white);
+        setImageLabel(image, "src\\imgs\\gatti.jpg"); 
+        leftPanel.add(image);
 
-        usuarioTxt.setBounds(370, 170, 220, 40);
-        usuarioTxt.setFont(new java.awt.Font("Trebuchet MS", 1, 12));
-        usuarioTxt.setForeground(Color.gray);
-        mainPanel.add(usuarioTxt);
+        JPanel centerPanel = new JPanel();
+        centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.PAGE_AXIS));
+        centerPanel.setBackground(Color.white);
 
-        passwordTxt.setBounds(370, 240, 220, 40);
-        passwordTxt.setFont(new java.awt.Font("Trebuchet MS", 1, 12));
-        passwordTxt.setForeground(Color.gray);
-        passwordTxt.setEchoChar((char) 0);
-        mainPanel.add(passwordTxt);
+        setImageLabel(logoLabel, "src\\imgs\\Instagram_logo.svg.png"); 
+        logoLabel.setAlignmentX(Component.CENTER_ALIGNMENT);  
+        logoLabel.setPreferredSize(new Dimension(70,100));
+        centerPanel.add(logoLabel);
+        centerPanel.add(Box.createVerticalStrut(10)); 
 
-        usuarioTxt.addFocusListener(new FocusAdapter() {
-            public void focusGained(FocusEvent e) {
-                if (usuarioTxt.getText().equals("Ingrese usuario")) {
-                    usuarioTxt.setText("");
-                    usuarioTxt.setForeground(Color.black);
-                }
-            }
+        usuarioTxt.setPreferredSize(new Dimension(200, 30));
+        usuarioTxt.setMaximumSize(new Dimension(200, 30));
+        usuarioTxt.setAlignmentX(Component.CENTER_ALIGNMENT);
+        centerPanel.add(usuarioTxt);
+        centerPanel.add(Box.createVerticalStrut(10));
 
-            @Override
-            public void focusLost(FocusEvent e) {
-                if (usuarioTxt.getText().isEmpty()) {
-                    usuarioTxt.setForeground(Color.gray);
-                    usuarioTxt.setText("Ingrese usuario");
-                }
-            }
-        });
+        passwordTxt.setPreferredSize(new Dimension(200, 30));
+        passwordTxt.setMaximumSize(new Dimension(200, 30));
+        passwordTxt.setAlignmentX(Component.CENTER_ALIGNMENT); 
+        centerPanel.add(passwordTxt);
+        centerPanel.add(Box.createVerticalStrut(10));
 
-        passwordTxt.addFocusListener(new FocusAdapter() {
-            public void focusGained(FocusEvent e) {
-                if (String.valueOf(passwordTxt.getPassword()).equals("Ingrese contraseña")) {
-                    passwordTxt.setText("");
-                    passwordTxt.setForeground(Color.black);
-                    passwordTxt.setEchoChar('*'); 
-                }
-            }
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setBackground(Color.white);
+        centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.PAGE_AXIS));
+        //buttonPanel.setBorder(new EmptyBorder(0, 300, 0, 300));
 
-            @Override
-            public void focusLost(FocusEvent e) {
-                if (String.valueOf(passwordTxt.getPassword()).isEmpty()) {
-                    passwordTxt.setForeground(Color.gray);
-                    passwordTxt.setText("Ingrese contraseña");
-                    passwordTxt.setEchoChar((char) 0);
-                }
-            }
-        });
-
-        login.setBounds(400, 300, 160, 30);
-        login.setFont(new java.awt.Font("Trebuchet MS", 4, 12));
+        login.setPreferredSize(new Dimension(200, 30));
+        login.setFont(new Font("Trebuchet MS", Font.PLAIN, 12));
         login.setForeground(Color.white);
         login.setBackground(Color.blue);
+        login.setAlignmentX(Component.CENTER_ALIGNMENT);
         login.addActionListener(this);
-        mainPanel.add(login);
-        
-        signupLabel.setBounds(340, 340, 220, 40);
-        signupLabel.setFont(new java.awt.Font("Trebuchet MS", 1, 12));
-        signupLabel.setForeground(Color.gray);
-        mainPanel.add(signupLabel);
-        
-        signup.setBounds(460, 350, 80, 20);
-        signup.setFont(new java.awt.Font("Trebuchet MS", 4, 12));
-        signup.setForeground(Color.blue);
-        signup.setBackground(Color.white);
-        signup.addActionListener(this);
-        mainPanel.add(signup);
+        centerPanel.add(login);
+        centerPanel.add(Box.createVerticalStrut(10));
 
-        
-        
-        setContentPane(mainPanel);
-        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        setLocationRelativeTo(this);
-        setVisible(true);
-    }
-    
-    public JPanel getMainPanel() {
-        return mainPanel;
+        buttonPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        signup.setPreferredSize(new Dimension(100, 30));
+        signup.setForeground(Color.blue);
+        signup.setAlignmentX(Component.CENTER_ALIGNMENT);
+        signup.addActionListener(this);
+        centerPanel.add(signup);
+        centerPanel.add(Box.createVerticalStrut(10));
+
+        //centerPanel.add(buttonPanel, BorderLayout.CENTER);
+        JPanel rightPanel = new JPanel();
+        rightPanel.setBackground(Color.white);
+
+        mainPanel.add(centerPanel, BorderLayout.CENTER);
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(50, 50, 50, 50));
+        contentPanel.add(mainPanel, "default");
+        add(contentPanel, BorderLayout.CENTER);
     }
 
     private void setImageLabel(JLabel labelName, String root) {
         ImageIcon image = new ImageIcon(root);
-        Icon icon = new ImageIcon(image.getImage().getScaledInstance(labelName.getWidth(), labelName.getHeight(), Image.SCALE_DEFAULT));
+        Icon icon = new ImageIcon(image.getImage().getScaledInstance(210, 120, Image.SCALE_DEFAULT));
         labelName.setIcon(icon);
         this.repaint();
     }
-        
     
-    public static void main(String[] args) {
-        InstaLogin frame = new InstaLogin();
+    public JPanel getMainPanel() {
+        return mainPanel;  
     }
 
     public void actionPerformed(ActionEvent e) {
-        if (login==e.getSource()){
-            String cuenta = usuarioTxt.getText().toLowerCase();
-            String password = new String(passwordTxt.getPassword());
+        CardLayout cardActual = (CardLayout) (contentPanel.getLayout());
 
-            if ((usuarioTxt.getText()).isEmpty()==true){
+        if (login == e.getSource()) {
+            cuenta = usuarioTxt.getText().toLowerCase();
+            password = new String(passwordTxt.getPassword());
+
+            if (usuarioTxt.getText().isEmpty()) {
                 JOptionPane.showMessageDialog(null, "Ingrese el usuario.", "Error", JOptionPane.ERROR_MESSAGE);
                 usuarioTxt.requestFocus();
                 return;
             }
-
-           IgCuentas.iniciarSesion(cuenta, password);
-       }
-        
-        if (signup==e.getSource()){
-           new InstaSignup().setVisible(true);
-           this.setVisible(false); 
+            if (String.valueOf(passwordTxt.getPassword()).isEmpty()) {
+               JOptionPane.showMessageDialog(null, "Ingrese la contraseña.", "Error", JOptionPane.ERROR_MESSAGE);
+                passwordTxt.requestFocus();
+                return; 
+            }
+            if (cuentas.iniciarSesion(cuenta, password)){
+            contentPanel.add(new Insta(this), "instagram");
+            cardActual.show(contentPanel, "instagram");
+            } else {
+                JOptionPane.showMessageDialog(null,"Error al ingresar");
+            }
+        } else if (signup == e.getSource()) {
+            contentPanel.add(new SignupPanel(this), "signup");
+            cardActual.show(contentPanel, "signup");
         }
-
-
+    }
+    
+    
+    class Insta extends JPanel {
+        InstaLogin Log;
+        Insta(InstaLogin Log){
+            this.Log=Log;
+            setLayout(new BorderLayout());   
+            Instagram ig = new Instagram(Log);
+            add(ig, BorderLayout.CENTER);
+            revalidate();
+            repaint();  
+        }
     }
 }

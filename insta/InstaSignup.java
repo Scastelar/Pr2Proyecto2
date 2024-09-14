@@ -1,6 +1,5 @@
 package insta;
 
-import Insta.InstaLogin;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -21,13 +20,16 @@ public class InstaSignup extends JFrame implements ActionListener {
     JTextField edadField = new JTextField();
     JLabel generoLabel = new JLabel("Genero: ");
     JComboBox<Character> generoComboBox = new JComboBox<>(new Character[]{'M', 'F'});
+    JPanel contentPanel = new JPanel(new CardLayout());
     private JButton registrarButton;
     private JButton seleccionarImagenButton;
     private JButton regresarButton;
     JLabel imagenLabel = new JLabel();
     String rutaImagenPerfil;
+    static InstaLogin Log;
 
-    public InstaSignup() {
+    public InstaSignup(InstaLogin Log) {
+        this.Log = Log;
         setTitle("Registro de Usuario");
         setSize(730, 480);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -35,12 +37,12 @@ public class InstaSignup extends JFrame implements ActionListener {
         setLayout(new BorderLayout());
         
         JPanel mainPanel = new JPanel();
-        mainPanel.setLayout(new GridLayout(4, 1)); // Cambiado a GridLayout con una columna
+        mainPanel.setLayout(new GridLayout(4, 1)); 
 
         // Logo Panel
         JPanel panelLogo = new JPanel();
         panelLogo.setBackground(Color.white);
-        logoImg.setSize(220, 85); // Establece el tamaño preferido
+        logoImg.setSize(220, 85);
         logoImg.setBorder(new EmptyBorder(40, 0, 0, 0));
         setImageLabel(logoImg, "src\\imgs\\Instagram_logo.svg.png");
         panelLogo.add(logoImg);
@@ -48,7 +50,7 @@ public class InstaSignup extends JFrame implements ActionListener {
         
         // Panel de Datos
         JPanel panelDatos = new JPanel(new GridLayout(6, 2));
-        panelDatos.setBorder(new EmptyBorder(0, 400, 0, 400));
+        panelDatos.setBorder(new EmptyBorder(0, 200, 0, 200));
         panelDatos.setBackground(Color.white);
         panelDatos.add(nombreLabel);
         panelDatos.add(nombreField);
@@ -69,6 +71,7 @@ public class InstaSignup extends JFrame implements ActionListener {
         imagenLabel.setHorizontalAlignment(JLabel.CENTER);
         imagenLabel.setBorder(BorderFactory.createLineBorder(Color.blue));
         seleccionarImagenButton = crearBoton("Seleccionar Imagen");
+        seleccionarImagenButton.setForeground(Color.blue);
         imagenPanel.add(new JLabel());
         imagenPanel.add(seleccionarImagenButton);
         imagenPanel.add(imagenLabel);
@@ -78,15 +81,18 @@ public class InstaSignup extends JFrame implements ActionListener {
         JPanel botones = new JPanel(new FlowLayout());
         botones.setBackground(Color.white);
         regresarButton = crearBoton("Regresar a Login"); 
+        regresarButton.setBackground(Color.lightGray);
+        regresarButton.setForeground(Color.white);
         registrarButton = crearBoton("Registrar"); 
         registrarButton.setBackground(Color.blue);
         registrarButton.setForeground(Color.white);
         botones.add(regresarButton);
         botones.add(registrarButton);
         mainPanel.add(botones);
-        
-        add(mainPanel, BorderLayout.CENTER);
-        setVisible(true);
+        contentPanel.add(mainPanel, "default");
+        add(contentPanel, BorderLayout.CENTER);
+       // add(mainPanel, BorderLayout.CENTER);
+        //setVisible(true);
     }
     
     private void setImageLabel(JLabel labelName, String root) {
@@ -105,8 +111,15 @@ public class InstaSignup extends JFrame implements ActionListener {
         return button;
     }
 
+    public JPanel getJFrame(){
+        return (JPanel)
+                this.getContentPane();
+    }
+    
     @Override
     public void actionPerformed(ActionEvent e) {
+    CardLayout cardActual = (CardLayout) (contentPanel.getLayout());
+
         if (e.getSource() == seleccionarImagenButton) {
             JFileChooser fileChooser = new JFileChooser();
             FileNameExtensionFilter filter = new FileNameExtensionFilter("Imágenes", "jpg", "png", "jpeg");
@@ -163,21 +176,26 @@ public class InstaSignup extends JFrame implements ActionListener {
                 return;
             }
 
-            IgCuentas.crearUsuario(nombre, genero, username, password, edad, rutaImagenPerfil);
+            Log.cuentas.crearUsuario(nombre, genero, username, password, edad, rutaImagenPerfil);
             JOptionPane.showMessageDialog(null, "Usuario registrado con éxito!");
-
-            InstaLogin loginFrame = new InstaLogin();
-            loginFrame.setVisible(true);
-            dispose(); 
+ 
         } else if (e.getSource() == regresarButton) {
-            // Volver al login
-            InstaLogin loginFrame = new InstaLogin();
-            loginFrame.setVisible(true);
-            dispose(); // Cierra la ventana actual
+            contentPanel.add(new LogPanel(), "signup");
+            cardActual.show(contentPanel, "signup");
         }
     }
+    
+    class LogPanel extends JPanel {
+    public LogPanel() {
+        setLayout(new BorderLayout());   
+            InstaLogin log = new InstaLogin();
+            add(log, BorderLayout.CENTER);
+            revalidate();
+            repaint();
+    }
+}
 
     public static void main(String[] args) {
-        InstaSignup frame = new InstaSignup();
+        InstaSignup frame = new InstaSignup(Log);
     }
 }

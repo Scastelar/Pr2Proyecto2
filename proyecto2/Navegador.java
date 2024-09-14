@@ -34,6 +34,9 @@ public class Navegador extends JPanel implements ActionListener {
         this.currentUser = userManager.getCurrentUser();
         this.clipboard = null;
         dirActual = new File("Z/Users/" + currentUser.getUsername());
+        if (currentUser.getUsername().equals("admin")){
+            dirActual = new File("Z/Users");
+        }
         setLayout(new BorderLayout());
         setPreferredSize(new Dimension(730, 480));
 

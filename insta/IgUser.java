@@ -6,7 +6,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 public class IgUser implements Serializable {
-
+    private static final long serialVersionUID = 1L;
     private String nombre;
     private char genero;
     private String username;
@@ -14,6 +14,8 @@ public class IgUser implements Serializable {
     private Date fecha;
     private int edad;
     private String fotoPerfil;
+    private boolean estado;
+    private transient File userDir;
 
     public IgUser(String nombre, char genero, String username, String password, int edad, String fotoPerfil) {
         this.nombre = nombre;
@@ -24,6 +26,7 @@ public class IgUser implements Serializable {
         this.edad = edad;
         this.estado = true; 
         this.fotoPerfil = fotoPerfil;
+        this.userDir = new File(username); 
     }
 
     public String getNombre() {
@@ -73,8 +76,6 @@ public class IgUser implements Serializable {
     public void setUserDir(File userDir) {
         this.userDir = userDir;
     }
-    private boolean estado;
-    private File userDir;
 
     public String getUsername() {
         return username;
@@ -84,10 +85,18 @@ public class IgUser implements Serializable {
         return password;
     }
     
+      public String getFotoPerfil() {
+        return fotoPerfil;
+    }
+
+    public void setFotoPerfil(String fotoPerfil) {
+        this.fotoPerfil = fotoPerfil;
+    }
+
+    @Override
     public String toString() {
         return "Nombre: " + nombre + ", Username: " + username + ", Genero: " + genero +
                ", Fecha Entrada: " + fecha + ", Edad: " + edad + ", Activo: " + estado +
                ", Foto: " + fotoPerfil;
     }
-
 }

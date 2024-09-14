@@ -1,6 +1,7 @@
 package proyecto2;
 
 import cmd.CMD;
+import insta.InstaLogin;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
@@ -68,6 +69,7 @@ public class Windows extends JFrame implements ActionListener {
         fechaLabel.setFont(new Font("Arial", Font.BOLD, 14));
         barra2.add(fechaLabel);
 
+        contentPanel.setBackground(Color.white);
         contentPanel.add(defaultLabel, "default");
 
         contentPanel.addComponentListener(new java.awt.event.ComponentAdapter() {
@@ -137,7 +139,7 @@ public class Windows extends JFrame implements ActionListener {
             cardActual.show(contentPanel, "VisorImagenes");
         } 
         else if (e.getSource() == ig) {
-           // contentPanel.add(new Instagram(), "VisorImagenes");
+            contentPanel.add(new Instagram(), "instagram");
             cardActual.show(contentPanel, "instagram");
         } 
     }
@@ -184,17 +186,15 @@ public class Windows extends JFrame implements ActionListener {
             repaint();
         }
     }
-    /*
+    
     class Instagram extends JPanel {
         Instagram(){
-           contentPanel.setLayout(new BorderLayout());   
-            InstaLogin frame = new InstaLogin();
-            JPanel panel = frame.getMainPanel();
-            panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS)); 
-            this.add(frame, BorderLayout.CENTER);
-            this.revalidate();
-            this.repaint();  
+             setLayout(new BorderLayout());   
+            InstaLogin log = new InstaLogin();
+            add(log, BorderLayout.CENTER);
+            revalidate();
+            repaint();  
         }
-    }*/
+    }
     
 }
