@@ -37,6 +37,7 @@ public class Instagram extends JPanel implements ActionListener {
 
         contentPanel.setBackground(Color.white);
         contentPanel.add(new Perfil(Log), "perfil");
+        contentPanel.add(new Comentarios(Log), "comentarios");
         contentPanel.add(new EditarPerfil(Log), "editar");
         contentPanel.add(new BuscarHashtag(Log), "buscar");
 
@@ -75,12 +76,16 @@ public class Instagram extends JPanel implements ActionListener {
         
         if (e.getSource() == perfilIG) {
             cardActual.show(contentPanel, "perfil");
+            
         } else if (e.getSource() == comentar) {
-
+            cardActual.show(contentPanel, "comentarios");
+                 
         } else if (e.getSource() == editar) {
             cardActual.show(contentPanel, "editar");
+        
         } else if (e.getSource() == search) {
             cardActual.show(contentPanel, "buscar");
+       
         } else if (e.getSource() == cerrar) {
             int confirm = JOptionPane.showConfirmDialog(null, "¿Estás seguro de que deseas cerrar sesión?", "Confirmar", JOptionPane.YES_NO_OPTION);
             if (confirm == JOptionPane.YES_OPTION) {

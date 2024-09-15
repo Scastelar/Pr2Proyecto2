@@ -13,12 +13,29 @@ public class IgCuentas {
         this.usuario = null;
     }
 
+    public static void crearCarpetaUsuario(String username) {
+        File directorio = new File(username);
+        if (!directorio.exists()) {
+            if (directorio.mkdir()) {
+                System.out.println("Directorio " + username + " creado.");
+                try {
+                    new File(directorio, "following.ins").createNewFile();
+                    new File(directorio, "followers.ins").createNewFile();
+                    new File(directorio, "insta.ins").createNewFile();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                System.out.println("No se pudo crear el directorio.");
+            }
+        }
+    }
     public static List<IgUser> leerUsuarios() {
         List<IgUser> usuarios = new ArrayList<>();
         File file = new File(dirUsuarios);
         if (!file.exists()) {
             System.out.println("No existe el archivo, se creará uno nuevo.");
-            return usuarios; // Retorna una lista vacía si el archivo no existe
+            return usuarios; 
         }
 
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
@@ -65,23 +82,6 @@ public class IgCuentas {
         }
     }
 
-    public static void crearCarpetaUsuario(String username) {
-        File directorio = new File(username);
-        if (!directorio.exists()) {
-            if (directorio.mkdir()) {
-                System.out.println("Directorio " + username + " creado.");
-                try {
-                    new File(directorio, "following.ins").createNewFile();
-                    new File(directorio, "followers.ins").createNewFile();
-                    new File(directorio, "insta.ins").createNewFile();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            } else {
-                System.out.println("No se pudo crear el directorio.");
-            }
-        }
-    }
 
     public boolean iniciarSesion(String username, String password) {
         List<IgUser> usuarios = leerUsuarios();
@@ -105,7 +105,7 @@ public class IgCuentas {
         return usuario;
     }
 
-    // Método para leer la lista de followers o following desde un archivo
+
     private List<String> leerListaDesdeArchivo(String archivoRuta) {
         List<String> lista = new ArrayList<>();
         File archivo = new File(archivoRuta);
@@ -117,13 +117,13 @@ public class IgCuentas {
                     lista.add(linea.trim());
                 }
             } catch (IOException e) {
-                e.printStackTrace(); // Manejo de errores
+                e.printStackTrace(); 
             }
         }
         return lista;
     }
 
-    // Método para escribir una lista en un archivo
+
     private void escribirListaEnArchivo(String archivoRuta, List<String> lista) {
         File archivo = new File(archivoRuta);
 
@@ -177,7 +177,6 @@ public class IgCuentas {
         }
     }
 
-    // Métodos para obtener la cantidad de followers y following
     public int obtenerCantidadFollowers(String username) {
         String archivoFollowers = username + "/followers.ins";
         return leerListaDesdeArchivo(archivoFollowers).size();

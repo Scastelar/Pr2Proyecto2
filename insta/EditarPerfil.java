@@ -1,6 +1,6 @@
 package insta;
 
-import static insta.Perfil.datosTxt;
+import static insta.Comentarios.scrollPane;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
@@ -32,7 +32,7 @@ public class EditarPerfil extends JPanel {
     private CardLayout cardLayout = new CardLayout();
     private JPanel contentPanel = new JPanel(cardLayout);
     JButton buscarButton = new JButton();
-    JButton activarButton = new JButton("Activar/Desactivar Cuenta");
+    JButton activarButton = new JButton("Desactivar Cuenta");
     JLabel tituloLabel = new JLabel("Busqueda de users  ", SwingConstants.CENTER);
     JPanel panel = new JPanel();
     JTextField textField = new JTextField(30);
@@ -65,7 +65,7 @@ public class EditarPerfil extends JPanel {
         add(activarButton, BorderLayout.SOUTH);
 
         buscarButton.addActionListener(e -> buscarPersonas());
-        activarButton.addActionListener(e -> activarDesactivarCuenta());
+        activarButton.addActionListener(e -> DesactivarCuenta());
         add(contentPanel, BorderLayout.CENTER);
         setVisible(true);
     }
@@ -101,27 +101,38 @@ public class EditarPerfil extends JPanel {
     }
 
     private void mostrarUsuarios(List<IgUser> users) {
-        JPanel userPanel = new JPanel(new BorderLayout());
+    JPanel userPanel = new JPanel(new BorderLayout());
 
-        String[] usernames = users.stream().map(IgUser::getUsername).toArray(String[]::new);
+    String loggedUsername = Log.cuentas.getUsuario().getUsername();
 
-        JList<String> userList = new JList<>(usernames);
-        userList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        userList.addListSelectionListener(e -> {
-            if (!e.getValueIsAdjusting()) {
-                int selectedIndex = userList.getSelectedIndex();
-                if (selectedIndex != -1) {
-                    mostrarPerfilUsuario(users.get(selectedIndex));
-                }
+    String[] usernames = users.stream().map(user -> {
+        if (user.getUsername().equals(loggedUsername)) {
+            return user.getUsername() + " - eres tú";
+        } else if (Log.cuentas.getUsuario().isFollowed(user)) {
+            return user.getUsername() + " - Lo sigues";
+        } else {
+            return user.getUsername() + " - No lo sigues";
+        }
+    }).toArray(String[]::new);
+
+    JList<String> userList = new JList<>(usernames);
+    userList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    userList.addListSelectionListener(e -> {
+        if (!e.getValueIsAdjusting()) {
+            int selectedIndex = userList.getSelectedIndex();
+            if (selectedIndex != -1) {
+                mostrarPerfilUsuario(users.get(selectedIndex));
             }
-        });
+        }
+    });
 
-        JScrollPane scrollPane = new JScrollPane(userList);
-        userPanel.add(scrollPane, BorderLayout.CENTER);
+    JScrollPane scrollPane = new JScrollPane(userList);
+    userPanel.add(scrollPane, BorderLayout.CENTER);
 
-        contentPanel.add(userPanel, "UserList");
-        cardLayout.show(contentPanel, "UserList");
-    }
+    contentPanel.add(userPanel, "UserList");
+    cardLayout.show(contentPanel, "UserList");
+}
+
 
     private void mostrarPerfilUsuario(IgUser user) {
         JPanel perfilPanel = new JPanel(new BorderLayout());
@@ -158,6 +169,9 @@ public class EditarPerfil extends JPanel {
         Perfil.datosTxt.setText("Followers: " + Log.cuentas.getUsuario().getCantidadFollowers() + " |  Following: " + Log.cuentas.getUsuario().getCantidadFollowing());
 
         // Redibujar los labels para reflejar el cambio
+        Comentarios.cargarComentarios();
+        Comentarios.scrollPane.revalidate();
+        Comentarios.scrollPane.repaint();
         Perfil.profilePanel.revalidate();
         Perfil.profilePanel.repaint();
         perfilPanel.revalidate();
@@ -186,7 +200,7 @@ public class EditarPerfil extends JPanel {
         cardLayout.show(contentPanel, "PerfilUsuario");
     }
 
-    private void activarDesactivarCuenta() {
+    private void DesactivarCuenta() {
         if (Log.cuentas.getUsuario().isActivo()) {
             int confirm = JOptionPane.showConfirmDialog(null, "¿Deseas desactivar tu cuenta?", "Confirmar", JOptionPane.YES_NO_OPTION);
             if (confirm == JOptionPane.YES_OPTION) {
@@ -194,13 +208,6 @@ public class EditarPerfil extends JPanel {
                 actualizarUsuario(Log.cuentas.getUsuario());
                 JOptionPane.showMessageDialog(null, "Cuenta Desactivada");
                 cardLayout.show(contentPanel, "Login");
-            }
-        } else {
-            int confirm = JOptionPane.showConfirmDialog(null, "¿Deseas activar tu cuenta?", "Confirmar", JOptionPane.YES_NO_OPTION);
-            if (confirm == JOptionPane.YES_OPTION) {
-                Log.cuentas.getUsuario().setEstado(true);
-                actualizarUsuario(Log.cuentas.getUsuario());
-                JOptionPane.showMessageDialog(null, "Cuenta Activada");
             }
         }
     }

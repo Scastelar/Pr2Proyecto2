@@ -1,63 +1,121 @@
-
 package insta;
 
-import java.awt.BorderLayout;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.util.ArrayList;
-import java.util.Comparator;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.*;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.List;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 
 public class Comentarios extends JPanel {
-    private static IgUser usuarioActivo;
-    static InstaLogin Log;
-    private static String usuarioActual;
-
-
+    static JTextArea comentariosArea;
+    static JScrollPane scrollPane;
+    private JTextField nuevoComentarioField;
+    private JButton agregarComentarioButton;
+    private static File instaFile;
+    private static File followingFile;
+    private String username;
+    InstaLogin Log;
+    
     public Comentarios(InstaLogin Log) {
-        this.Log=Log;
-        usuarioActual = Log.cuentas.getUsuario().getUsername();
-        setSize(400, 300);
+        this.username = Log.cuentas.getUsuario().getUsername();
+        instaFile = new File(Log.cuentas.getUsuario().getUsername() , "insta.ins");
+        followingFile = new File(Log.cuentas.getUsuario().getUsername(), "following.ins");
+        
         setLayout(new BorderLayout());
-
-        JTextArea textArea = new JTextArea();
-        textArea.setEditable(false);
-
-        List<String> comentarios = cargarComentarios();
-        comentarios.forEach(c -> textArea.append(c + "\n"));
-
-        add(new JScrollPane(textArea), BorderLayout.CENTER);
+        
+        comentariosArea = new JTextArea(20, 40);
+        comentariosArea.setEditable(false);
+        scrollPane = new JScrollPane(comentariosArea);
+        add(scrollPane, BorderLayout.CENTER);
+        
+        nuevoComentarioField = new JTextField(30);
+        agregarComentarioButton = new JButton("Agregar comentario");
+        
+        JPanel panelComentario = new JPanel();
+        panelComentario.add(nuevoComentarioField);
+        panelComentario.add(agregarComentarioButton);
+        add(panelComentario, BorderLayout.NORTH);
+        
+        agregarComentarioButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                agregarComentario();
+            }
+        });
+        
+        cargarComentarios();
     }
-    public static List<String> cargarComentarios() {
-        List<String> comentarios = new ArrayList<>();
-        comentarios.addAll(leerComentarios(usuarioActual));
-        File archivo = new File(usuarioActual + "/following.ins");
-        List<String> following = IgUser.leerUsuariosDesdeArchivo(archivo);
-        for (String followedUser : following) {
-            comentarios.addAll(leerComentarios(followedUser));
+    
+    private void agregarComentario() {
+        String comentario = nuevoComentarioField.getText();
+        if (comentario.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "El comentario no puede estar vacío", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        if (comentario.length() > 140) {
+            JOptionPane.showMessageDialog(this, "El comentario no puede exceder los 140 caracteres", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
         }
 
-        comentarios.sort(Comparator.reverseOrder());
-
-        return comentarios;
-    }
-
-    public static List<String> leerComentarios(String username) {
-        List<String> comentarios = new ArrayList<>();
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(username + "/insta.ins"))) {
-            comentarios = (List<String>) ois.readObject();
-        } catch (FileNotFoundException e) {
-            System.out.println("No se encontraron comentarios para " + username);
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
+        String fecha = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date());
+        String nuevoComentario = username + " escribió:\n" + "\"" + comentario + "\" el [" + fecha + "]\n\n";
+        
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(instaFile, true))) {
+            writer.write(nuevoComentario);
+        } catch (IOException ex) {
+            ex.printStackTrace();
         }
-        return comentarios;
+        
+        nuevoComentarioField.setText("");
+        cargarComentarios();
+    }
+    
+    public static void cargarComentarios() {
+        comentariosArea.setText("");
+        List<String> comentarios = new ArrayList<>();
+        
+        cargarComentariosDesdeArchivo(instaFile, comentarios);
+        
+        cargarComentariosDeFollowing(comentarios);
+        
+        Collections.reverse(comentarios);
+        for (String comentario : comentarios) {
+            comentariosArea.append(comentario);
+        }
+    }
+    
+    private static void cargarComentariosDesdeArchivo(File file, List<String> comentarios) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String linea;
+            StringBuilder comentarioActual = new StringBuilder();
+            while ((linea = reader.readLine()) != null) {
+                comentarioActual.append(linea).append("\n");
+                if (linea.trim().isEmpty()) {
+                    comentarios.add(comentarioActual.toString());
+                    comentarioActual.setLength(0); 
+                }
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+    
+    private static void cargarComentariosDeFollowing(List<String> comentarios) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(followingFile))) {
+            String followingUsername;
+            while ((followingUsername = reader.readLine()) != null) {
+                File followingInstaFile = new File(followingUsername ,"insta.ins");
+                
+                if (followingInstaFile.exists()) {
+                    cargarComentariosDesdeArchivo(followingInstaFile, comentarios);
+                }
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
     }
 }
-
