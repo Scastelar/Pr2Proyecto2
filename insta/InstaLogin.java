@@ -17,74 +17,60 @@ public class InstaLogin extends JPanel implements ActionListener {
     private String cuenta, password;
 
     public InstaLogin() {
-        cuentas = new IgCuentas();
-        this.contentPanel.setPreferredSize(new Dimension(730, 550));
-        contentPanel.setBackground(Color.white);
+    cuentas = new IgCuentas();
+    
+    contentPanel.setLayout(new CardLayout());
+    contentPanel.setBackground(Color.white);
 
-        mainPanel.setBackground(Color.white);
+    mainPanel.setLayout(new BorderLayout());
+    mainPanel.setBackground(Color.white);
+    
 
-        JPanel leftPanel = new JPanel();
-        leftPanel.setBackground(Color.white);
-        setImageLabel(image, "src\\imgs\\gatti.jpg"); 
-        leftPanel.add(image);
+       
+    JPanel centerPanel = new JPanel();
+    centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.PAGE_AXIS));
+    centerPanel.setBackground(Color.white);
+    
+    setImageLabel(logoLabel, "src\\imgs\\Instagram_logo.svg.png");
+    logoLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+    centerPanel.add(logoLabel);
+    centerPanel.add(Box.createVerticalStrut(20));
+    
+    usuarioTxt.setMaximumSize(new Dimension(210, 30));
+    usuarioTxt.setAlignmentX(Component.CENTER_ALIGNMENT);
+    centerPanel.add(usuarioTxt);
+    centerPanel.add(Box.createVerticalStrut(20));
+    
+    passwordTxt.setMaximumSize(new Dimension(210, 30));
+    passwordTxt.setAlignmentX(Component.CENTER_ALIGNMENT);
+    centerPanel.add(passwordTxt);
+    centerPanel.add(Box.createVerticalStrut(20));
+    
+    login.addActionListener(this);
+    login.setBackground(Color.blue);
+    login.setForeground(Color.white);
+    login.setAlignmentX(Component.CENTER_ALIGNMENT);
+    centerPanel.add(login);
+    centerPanel.add(Box.createVerticalStrut(30));
+    signup.addActionListener(this);
+    signup.setAlignmentX(Component.CENTER_ALIGNMENT);
+    centerPanel.add(signup);
+    centerPanel.add(Box.createVerticalStrut(20));
+    
+    mainPanel.add(centerPanel, BorderLayout.CENTER);
+    
+    mainPanel.setBorder(null);
+    
+    contentPanel.add(mainPanel, "default");
+    
+    setLayout(new BorderLayout());
+    add(contentPanel, BorderLayout.CENTER);
+}
 
-        JPanel centerPanel = new JPanel();
-        centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.PAGE_AXIS));
-        centerPanel.setBackground(Color.white);
-
-        setImageLabel(logoLabel, "src\\imgs\\Instagram_logo.svg.png"); 
-        logoLabel.setAlignmentX(Component.CENTER_ALIGNMENT);  
-        logoLabel.setPreferredSize(new Dimension(70,100));
-        centerPanel.add(logoLabel);
-        centerPanel.add(Box.createVerticalStrut(10)); 
-
-        usuarioTxt.setPreferredSize(new Dimension(200, 30));
-        usuarioTxt.setMaximumSize(new Dimension(200, 30));
-        usuarioTxt.setAlignmentX(Component.CENTER_ALIGNMENT);
-        centerPanel.add(usuarioTxt);
-        centerPanel.add(Box.createVerticalStrut(10));
-
-        passwordTxt.setPreferredSize(new Dimension(200, 30));
-        passwordTxt.setMaximumSize(new Dimension(200, 30));
-        passwordTxt.setAlignmentX(Component.CENTER_ALIGNMENT); 
-        centerPanel.add(passwordTxt);
-        centerPanel.add(Box.createVerticalStrut(10));
-
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setBackground(Color.white);
-        centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.PAGE_AXIS));
-        //buttonPanel.setBorder(new EmptyBorder(0, 300, 0, 300));
-
-        login.setPreferredSize(new Dimension(200, 30));
-        login.setFont(new Font("Trebuchet MS", Font.PLAIN, 12));
-        login.setForeground(Color.white);
-        login.setBackground(Color.blue);
-        login.setAlignmentX(Component.CENTER_ALIGNMENT);
-        login.addActionListener(this);
-        centerPanel.add(login);
-        centerPanel.add(Box.createVerticalStrut(10));
-
-        buttonPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-        signup.setPreferredSize(new Dimension(100, 30));
-        signup.setForeground(Color.blue);
-        signup.setAlignmentX(Component.CENTER_ALIGNMENT);
-        signup.addActionListener(this);
-        centerPanel.add(signup);
-        centerPanel.add(Box.createVerticalStrut(10));
-
-        //centerPanel.add(buttonPanel, BorderLayout.CENTER);
-        JPanel rightPanel = new JPanel();
-        rightPanel.setBackground(Color.white);
-
-        mainPanel.add(centerPanel, BorderLayout.CENTER);
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(50, 50, 50, 50));
-        contentPanel.add(mainPanel, "default");
-        add(contentPanel, BorderLayout.CENTER);
-    }
 
     private void setImageLabel(JLabel labelName, String root) {
         ImageIcon image = new ImageIcon(root);
-        Icon icon = new ImageIcon(image.getImage().getScaledInstance(210, 120, Image.SCALE_DEFAULT));
+        Icon icon = new ImageIcon(image.getImage().getScaledInstance(260, 120, Image.SCALE_DEFAULT));
         labelName.setIcon(icon);
         this.repaint();
     }

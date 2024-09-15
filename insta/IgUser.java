@@ -1,11 +1,19 @@
 package insta;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 public class IgUser implements Serializable {
+
     private static final long serialVersionUID = 1L;
     private String nombre;
     private char genero;
@@ -24,9 +32,9 @@ public class IgUser implements Serializable {
         this.password = password;
         this.fecha = Calendar.getInstance().getTime();
         this.edad = edad;
-        this.estado = true; 
+        this.estado = true;
         this.fotoPerfil = fotoPerfil;
-        this.userDir = new File(username); 
+        this.userDir = new File(username);
     }
 
     public String getNombre() {
@@ -84,8 +92,8 @@ public class IgUser implements Serializable {
     public String getPassword() {
         return password;
     }
-    
-      public String getFotoPerfil() {
+
+    public String getFotoPerfil() {
         return fotoPerfil;
     }
 
@@ -93,10 +101,70 @@ public class IgUser implements Serializable {
         this.fotoPerfil = fotoPerfil;
     }
 
+    public int getCantidadFollowers() {
+        File followersFile = new File(username, "followers.ins");
+        return contarUsuariosEnArchivo(followersFile);
+    }
+
+    public int getCantidadFollowing() {
+        File followingFile = new File(username, "following.ins");
+        return contarUsuariosEnArchivo(followingFile);
+    }
+
     @Override
     public String toString() {
-        return "Nombre: " + nombre + ", Username: " + username + ", Genero: " + genero +
-               ", Fecha Entrada: " + fecha + ", Edad: " + edad + ", Activo: " + estado +
-               ", Foto: " + fotoPerfil;
+        return "Nombre: " + nombre + ", Username: " + username + ", Genero: " + genero
+                + ", Fecha Entrada: " + fecha + ", Edad: " + edad + ", Activo: " + estado
+                + ", Foto: " + fotoPerfil;
+    }
+
+    private int contarUsuariosEnArchivo(File archivo) {
+        int count = 0;
+        if (archivo.exists()) {
+            try (BufferedReader br = new BufferedReader(new FileReader(archivo))) {
+                while (br.readLine() != null) {
+                    count++;
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return count;
+    }
+
+    public boolean isFollowed(IgUser user) {
+        File followingFile = new File(username, "following.ins");  // Verificar el archivo "following.ins" del usuario logueado
+        List<String> siguiendo = leerUsuariosDesdeArchivo(followingFile);
+
+        return siguiendo.contains(user.getUsername());
+    }
+
+    public static List<String> leerUsuariosDesdeArchivo(File archivo) {
+        List<String> usuarios = new ArrayList<>();
+        if (archivo.exists()) {
+            try (BufferedReader br = new BufferedReader(new FileReader(archivo))) {
+                String line;
+                while ((line = br.readLine()) != null) {
+                    usuarios.add(line);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return usuarios;
+    }
+
+    public void agregarSeguidor(IgUser user) {
+        File followersFile = new File(username, "followers.ins");
+        escribirUsuarioEnArchivo(followersFile, user.getUsername());
+    }
+
+    private void escribirUsuarioEnArchivo(File archivo, String username) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(archivo, true))) {
+            bw.write(username);
+            bw.newLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

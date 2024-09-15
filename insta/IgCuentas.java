@@ -5,14 +5,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class IgCuentas {
+
     private static final String dirUsuarios = "users.ins";
     private IgUser usuario;
 
-    IgCuentas(){
+    IgCuentas() {
         this.usuario = null;
     }
 
-    // Leer todos los usuarios del archivo binario
     public static List<IgUser> leerUsuarios() {
         List<IgUser> usuarios = new ArrayList<>();
         File file = new File(dirUsuarios);
@@ -34,7 +34,6 @@ public class IgCuentas {
         return usuarios;
     }
 
-    // Guardar la lista de usuarios en el archivo binario
     public static void escribirUsuarios(List<IgUser> usuarios) {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(dirUsuarios))) {
             oos.writeObject(usuarios);
@@ -43,7 +42,6 @@ public class IgCuentas {
         }
     }
 
-    // Verificar si el username es único
     public static boolean isUsernameUnico(String username) {
         List<IgUser> usuarios = leerUsuarios();
         for (IgUser usuario : usuarios) {
@@ -54,7 +52,6 @@ public class IgCuentas {
         return true;
     }
 
-    // Crear un nuevo usuario
     public static void crearUsuario(String nombre, char genero, String username, String password, int edad, String fotoPerfil) {
         if (isUsernameUnico(username)) {
             IgUser nuevoUsuario = new IgUser(nombre, genero, username, password, edad, fotoPerfil);
@@ -68,7 +65,6 @@ public class IgCuentas {
         }
     }
 
-    // Crear carpeta del usuario
     public static void crearCarpetaUsuario(String username) {
         File directorio = new File(username);
         if (!directorio.exists()) {
@@ -87,14 +83,13 @@ public class IgCuentas {
         }
     }
 
-    // Iniciar sesión
     public boolean iniciarSesion(String username, String password) {
         List<IgUser> usuarios = leerUsuarios();
         for (IgUser usuario : usuarios) {
             if (usuario.getUsername().equals(username) && usuario.getPassword().equals(password)) {
                 if (usuario.isActivo()) {
                     System.out.println("Inicio de sesión exitoso. Bienvenido, " + usuario.getNombre());
-                    this.usuario = usuario; // Opcional: almacenar el usuario en una variable de instancia
+                    this.usuario = usuario;
                     return true;
                 } else {
                     System.out.println("La cuenta está desactivada.");
@@ -108,5 +103,88 @@ public class IgCuentas {
 
     public IgUser getUsuario() {
         return usuario;
+    }
+
+    // Método para leer la lista de followers o following desde un archivo
+    private List<String> leerListaDesdeArchivo(String archivoRuta) {
+        List<String> lista = new ArrayList<>();
+        File archivo = new File(archivoRuta);
+
+        if (archivo.exists()) {
+            try (BufferedReader reader = new BufferedReader(new FileReader(archivo))) {
+                String linea;
+                while ((linea = reader.readLine()) != null) {
+                    lista.add(linea.trim());
+                }
+            } catch (IOException e) {
+                e.printStackTrace(); // Manejo de errores
+            }
+        }
+        return lista;
+    }
+
+    // Método para escribir una lista en un archivo
+    private void escribirListaEnArchivo(String archivoRuta, List<String> lista) {
+        File archivo = new File(archivoRuta);
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(archivo))) {
+            for (String item : lista) {
+                writer.write(item);
+                writer.newLine();
+            }
+        } catch (IOException e) {
+            e.printStackTrace(); 
+        }
+    }
+
+    public void seguir(String usuarioLogueado, String usuarioASeguir) {
+        String archivoFollowing = usuarioLogueado + "/following.ins";
+        String archivoFollowers = usuarioASeguir + "/followers.ins";
+
+        List<String> siguiendo = leerListaDesdeArchivo(archivoFollowing);
+        List<String> seguidores = leerListaDesdeArchivo(archivoFollowers);
+
+        if (!siguiendo.contains(usuarioASeguir)) {
+            siguiendo.add(usuarioASeguir);
+            seguidores.add(usuarioLogueado);
+
+            escribirListaEnArchivo(archivoFollowing, siguiendo);
+            escribirListaEnArchivo(archivoFollowers, seguidores);
+
+            System.out.println("Ahora sigues a " + usuarioASeguir);
+        } else {
+            System.out.println("Ya sigues a " + usuarioASeguir);
+        }
+    }
+
+    public void dejarDeSeguir(String usuarioLogueado, String usuarioADejarDeSeguir) {
+        String archivoFollowing = usuarioLogueado + "/following.ins";
+        String archivoFollowers = usuarioADejarDeSeguir + "/followers.ins";
+
+        List<String> siguiendo = leerListaDesdeArchivo(archivoFollowing);
+        List<String> seguidores = leerListaDesdeArchivo(archivoFollowers);
+
+        if (siguiendo.contains(usuarioADejarDeSeguir)) {
+            siguiendo.remove(usuarioADejarDeSeguir);
+            seguidores.remove(usuarioLogueado);
+
+            escribirListaEnArchivo(archivoFollowing, siguiendo);
+            escribirListaEnArchivo(archivoFollowers, seguidores);
+
+            System.out.println("Has dejado de seguir a " + usuarioADejarDeSeguir);
+        } else {
+            System.out.println("No sigues a " + usuarioADejarDeSeguir);
+        }
+    }
+
+    // Métodos para obtener la cantidad de followers y following
+    public int obtenerCantidadFollowers(String username) {
+        String archivoFollowers = username + "/followers.ins";
+        return leerListaDesdeArchivo(archivoFollowers).size();
+    }
+
+    public int obtenerCantidadFollowing(String username) {
+        String archivoFollowing = username + "/following.ins";
+        return leerListaDesdeArchivo(archivoFollowing).size();
     }
 }

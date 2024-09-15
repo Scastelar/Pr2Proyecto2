@@ -1,10 +1,8 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+
 package insta;
 
 import java.awt.BorderLayout;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -21,6 +19,7 @@ public class Comentarios extends JPanel {
     static InstaLogin Log;
     private static String usuarioActual;
 
+
     public Comentarios(InstaLogin Log) {
         this.Log=Log;
         usuarioActual = Log.cuentas.getUsuario().getUsername();
@@ -35,12 +34,11 @@ public class Comentarios extends JPanel {
 
         add(new JScrollPane(textArea), BorderLayout.CENTER);
     }
-
     public static List<String> cargarComentarios() {
         List<String> comentarios = new ArrayList<>();
         comentarios.addAll(leerComentarios(usuarioActual));
-
-        List<String> following = Perfil.leerUsuariosDeArchivo(usuarioActual + "/following.ins");
+        File archivo = new File(usuarioActual + "/following.ins");
+        List<String> following = IgUser.leerUsuariosDesdeArchivo(archivo);
         for (String followedUser : following) {
             comentarios.addAll(leerComentarios(followedUser));
         }

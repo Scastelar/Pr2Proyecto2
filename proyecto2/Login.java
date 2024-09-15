@@ -18,11 +18,12 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.WindowConstants;
 
-public class Login extends JFrame implements ActionListener{
+public class Login extends JFrame implements ActionListener {
+
     private UserManager userManager;
     JLabel perfilImg = new JLabel();
-    JTextField usuarioTxt = new JTextField("Ingrese usuario");  
-    JPasswordField passwordTxt = new JPasswordField("Ingrese contraseña"); 
+    JTextField usuarioTxt = new JTextField("Ingrese usuario");
+    JPasswordField passwordTxt = new JPasswordField("Ingrese contraseña");
     JButton login = new JButton("login");
     private JPanel mainPanel;
 
@@ -34,7 +35,6 @@ public class Login extends JFrame implements ActionListener{
         mainPanel.setLayout(null);
         mainPanel.setBackground(Color.white);
 
-        
         perfilImg.setBounds(280, 100, 130, 130);
         setImageLabel(perfilImg, "src\\imgs\\user.png");
         mainPanel.add(perfilImg);
@@ -72,7 +72,7 @@ public class Login extends JFrame implements ActionListener{
                 if (String.valueOf(passwordTxt.getPassword()).equals("Ingrese contraseña")) {
                     passwordTxt.setText("");
                     passwordTxt.setForeground(Color.black);
-                    passwordTxt.setEchoChar('*'); 
+                    passwordTxt.setEchoChar('*');
                 }
             }
 
@@ -94,15 +94,15 @@ public class Login extends JFrame implements ActionListener{
         mainPanel.add(login);
 
         JPanel container = new JPanel(new BorderLayout());
-        container.add(mainPanel,BorderLayout.CENTER);
+        container.add(mainPanel, BorderLayout.CENTER);
         add(container);
-        
+
         setContentPane(mainPanel);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setLocationRelativeTo(this);
         setVisible(true);
     }
-    
+
     public JPanel getMainPanel() {
         return mainPanel;
     }
@@ -115,19 +115,19 @@ public class Login extends JFrame implements ActionListener{
     }
 
     public void actionPerformed(ActionEvent e) {
-        if (login==e.getSource()){
+        if (login == e.getSource()) {
             String nombre = usuarioTxt.getText();
             String contrasena = String.valueOf(passwordTxt.getPassword());
-            if (userManager.login(nombre, contrasena)){
-                System.out.println("Ingreso de " +nombre+ " exitoso!");
+            if (userManager.login(nombre, contrasena)) {
+                System.out.println("Ingreso de " + nombre + " exitoso!");
                 new Windows(userManager).setVisible(true);
                 this.setVisible(false);
             }
         }
     }
-     
+
     public static void main(String[] args) {
         UserManager userManager = new UserManager();
         new Login(userManager).setVisible(true);
     }
-        }
+}
