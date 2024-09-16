@@ -33,8 +33,10 @@ public class Comentarios extends JPanel {
         
         nuevoComentarioField = new JTextField(30);
         agregarComentarioButton = new JButton("Agregar comentario");
+        agregarComentarioButton.setBackground(Color.white);
         
         JPanel panelComentario = new JPanel();
+        panelComentario.setBackground(Color.black);
         panelComentario.add(nuevoComentarioField);
         panelComentario.add(agregarComentarioButton);
         add(panelComentario, BorderLayout.NORTH);
@@ -83,7 +85,6 @@ public static void cargarComentarios() {
     cargarComentariosDesdeArchivo(instaFile, comentarios);
     cargarComentariosDeFollowing(comentarios);
 
-    // Ordena los comentarios por fecha
     Collections.sort(comentarios, new Comparator<String>() {
         SimpleDateFormat formatoFecha = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 
@@ -96,15 +97,14 @@ public static void cargarComentarios() {
                 Date date1 = formatoFecha.parse(fecha1);
                 Date date2 = formatoFecha.parse(fecha2);
 
-                return date2.compareTo(date1);  // Compara de más reciente a menos reciente
+                return date2.compareTo(date1);  
             } catch (Exception e) {
                 e.printStackTrace();
-                return 0;  // En caso de error, mantener el orden actual
+                return 0;  
             }
         }
 
         private String extraerFecha(String comentario) {
-            // Asume que la fecha está entre corchetes al final del comentario
             int inicioFecha = comentario.indexOf("[") + 1;
             int finFecha = comentario.indexOf("]");
             return comentario.substring(inicioFecha, finFecha);

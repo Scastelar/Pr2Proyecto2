@@ -27,10 +27,12 @@ public class ReproductorMusical extends JPanel {
     private Timer timer; // Para actualizar el progreso de la canción
     private final String filePath = "canciones.txt"; // Archivo donde se guardan las canciones
     private JLabel nowPlayingLabel;
+    private final File rootDirectory; 
 
     public ReproductorMusical(UserManager userManager) {
         this.userManager = userManager;
         this.currentUser = userManager.getCurrentUser();
+        this.rootDirectory = new File("Z\\Users\\");
         // Configuración básica de la ventana
         setSize(800, 500);
         setLayout(new GridBagLayout());
@@ -346,22 +348,38 @@ public class ReproductorMusical extends JPanel {
 
     // Método para agregar una canción
     private void agregarCancion() {
-        JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Archivos MP3", "mp3"));
-        if (fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-            File archivo = fileChooser.getSelectedFile();
-            String rutaArchivo = archivo.getAbsolutePath();
+    JFileChooser folderChooser = new JFileChooser();
+    folderChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+    
+    // Establecer el directorio inicial
+    folderChooser.setCurrentDirectory(new File("C:\\Users\\compu\\Documents\\NetBeansProjects\\Proyecto2\\Z\\Users\\" + currentUser.getUsername()));
+    if (currentUser.getUsername().equals("admin")) {
+        folderChooser.setCurrentDirectory(new File("C:\\Users\\compu\\Documents\\NetBeansProjects\\Proyecto2\\Z\\Users\\"));
+        }
+    // Mostrar el diálogo para seleccionar una carpeta
+    if (folderChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+        File carpetaSeleccionada = folderChooser.getSelectedFile();
+        File[] archivos = carpetaSeleccionada.listFiles((dir, name) -> name.toLowerCase().endsWith(".mp3"));
+        
+        if (archivos != null) {
+            for (File archivo : archivos) {
+                String rutaArchivo = archivo.getAbsolutePath();
 
-            // Verificar si la canción ya está en la lista
-            if (filePaths.contains(rutaArchivo)) {
-                JOptionPane.showMessageDialog(this, "La canción ya está en la lista.", "Advertencia", JOptionPane.WARNING_MESSAGE);
-            } else {
-                filePaths.add(rutaArchivo);
-                listModel.addElement(archivo.getName());
-                guardarCanciones();  // Guardar las canciones en el archivo de texto
+                // Verificar si la canción ya está en la lista
+                if (filePaths.contains(rutaArchivo)) {
+                    JOptionPane.showMessageDialog(this, "La canción " + archivo.getName() + " ya está en la lista.", "Advertencia", JOptionPane.WARNING_MESSAGE);
+                } else {
+                    filePaths.add(rutaArchivo);
+                    listModel.addElement(archivo.getName());
+                }
             }
+            guardarCanciones();  // Guardar las canciones en el archivo de texto
+        } else {
+            JOptionPane.showMessageDialog(this, "No se encontraron archivos MP3 en la carpeta seleccionada.", "Advertencia", JOptionPane.WARNING_MESSAGE);
         }
     }
+}
+
 
     // Método para eliminar una canción
     private void eliminarCancion() {

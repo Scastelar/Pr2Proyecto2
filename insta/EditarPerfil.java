@@ -1,4 +1,5 @@
 package insta;
+
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
@@ -9,8 +10,13 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -30,7 +36,7 @@ public class EditarPerfil extends JPanel {
     private CardLayout cardLayout = new CardLayout();
     private JPanel contentPanel = new JPanel(cardLayout);
     JButton buscarButton = new JButton();
-    JButton activarButton = new JButton("Desactivar Cuenta");
+    JButton activarButton = new JButton("Activar/Desactivar Cuenta");
     JLabel tituloLabel = new JLabel("Busqueda de users  ", SwingConstants.CENTER);
     JPanel panel = new JPanel();
     JTextField textField = new JTextField(30);
@@ -63,7 +69,7 @@ public class EditarPerfil extends JPanel {
         add(activarButton, BorderLayout.SOUTH);
 
         buscarButton.addActionListener(e -> buscarPersonas());
-        activarButton.addActionListener(e -> DesactivarCuenta());
+        activarButton.addActionListener(e -> activarDesactivarCuenta());
         add(contentPanel, BorderLayout.CENTER);
         setVisible(true);
     }
@@ -135,7 +141,6 @@ public class EditarPerfil extends JPanel {
         JPanel perfilPanel = new JPanel(new BorderLayout());
         perfilPanel.setBackground(Color.white);
 
-        perfilPanel.setBackground(Color.white);
         JPanel topPanel = new JPanel();
         topPanel.setBackground(Color.white);
         topPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
@@ -162,13 +167,13 @@ public class EditarPerfil extends JPanel {
 
             followersLabel.setText("Followers: " + user.getCantidadFollowers());
             followingLabel.setText("Following: " + user.getCantidadFollowing());
-        Perfil.datosTxt.removeAll();
-        Perfil.datosTxt.setText("Followers: " + Log.cuentas.getUsuario().getCantidadFollowers() + " |  Following: " + Log.cuentas.getUsuario().getCantidadFollowing());
-        // Redibujar los labels para reflejar el cambio
+            Perfil.datosTxt.removeAll();
+            Perfil.datosTxt.setText("Followers: " + Log.cuentas.getUsuario().getCantidadFollowers() + " |  Following: " + Log.cuentas.getUsuario().getCantidadFollowing());
+            // Redibujar los labels para reflejar el cambio
             Comentarios.cargarComentarios();
             Comentarios.scrollPane.revalidate();
             Comentarios.scrollPane.repaint();
-            
+
             perfilPanel.revalidate();
             perfilPanel.repaint();
         });
@@ -200,36 +205,37 @@ public class EditarPerfil extends JPanel {
         contentPanel.repaint();
     }
 
-    private void DesactivarCuenta() {
+    private void activarDesactivarCuenta() {
         if (Log.cuentas.getUsuario().isActivo()) {
             int confirm = JOptionPane.showConfirmDialog(null, "¿Deseas desactivar tu cuenta?", "Confirmar", JOptionPane.YES_NO_OPTION);
             if (confirm == JOptionPane.YES_OPTION) {
                 Log.cuentas.getUsuario().setEstado(false);
                 actualizarUsuario(Log.cuentas.getUsuario());
+
+                // Vacía el contenido del archivo insta.ins
+                vaciarArchivo("insta.ins");
+
                 JOptionPane.showMessageDialog(null, "Cuenta Desactivada");
-                eliminarDirectorioUsuario(Log.cuentas.getUsuario().getUsername());
                 cardLayout.show(contentPanel, "Login");
+            }
+        } else {
+            int confirm = JOptionPane.showConfirmDialog(null, "¿Deseas activar tu cuenta?", "Confirmar", JOptionPane.YES_NO_OPTION);
+            if (confirm == JOptionPane.YES_OPTION) {
+                Log.cuentas.getUsuario().setEstado(true);
+                actualizarUsuario(Log.cuentas.getUsuario());
+                JOptionPane.showMessageDialog(null, "Cuenta Activada");
             }
         }
     }
 
-    private void eliminarDirectorioUsuario(String username) {
-        File directorioUsuario = new File(username);
-
-        if (directorioUsuario.exists() && directorioUsuario.isDirectory()) {
-            File[] archivos = directorioUsuario.listFiles();
-
-            if (archivos != null) {
-                for (File archivo : archivos) {
-                    archivo.delete();
-                }
-            }
-
-            directorioUsuario.delete();
-
-            System.out.println("Directorio del usuario " + username + " eliminado correctamente.");
-        } else {
-            System.out.println("El directorio del usuario no existe.");
+    private void vaciarArchivo(String nombreArchivo) {
+        File archivo = new File(nombreArchivo);
+        try (FileWriter escritor = new FileWriter(archivo)) {
+            // Vacía el archivo escribiendo una cadena vacía
+            escritor.write("");
+            System.out.println("Contenido del archivo " + nombreArchivo + " borrado exitosamente.");
+        } catch (IOException e) {
+            System.out.println("No se pudo vaciar el archivo " + nombreArchivo + ": " + e.getMessage());
         }
     }
 
@@ -243,41 +249,73 @@ public class EditarPerfil extends JPanel {
         IgCuentas.escribirUsuarios(usuarios);
     }
 
-    private void cargarImagenesEnPanel(IgUser user) {
-        panelPosts.removeAll();
-        File directorioImagenes = new File(user.getUsername(), "imagenes/");
+   private void cargarImagenesEnPanel(IgUser user) {
+    panelPosts.removeAll();
+    File directorioImagenes = new File(user.getUsername(), "imagenes/");
 
-        if (directorioImagenes.exists() && directorioImagenes.isDirectory()) {
-            File[] imagenes = directorioImagenes.listFiles((dir, name)
-                    -> name.endsWith(".jpg") || name.endsWith(".png") || name.endsWith(".jpeg")
-            );
+    if (directorioImagenes.exists() && directorioImagenes.isDirectory()) {
+        File[] imagenes = directorioImagenes.listFiles((dir, name)
+                -> name.endsWith(".jpg") || name.endsWith(".png") || name.endsWith(".jpeg")
+        );
 
-            if (imagenes != null) {
-                java.util.Arrays.sort(imagenes, (f1, f2) -> Long.compare(f2.lastModified(), f1.lastModified()));
+        if (imagenes != null) {
+            java.util.Arrays.sort(imagenes, (f1, f2) -> Long.compare(f2.lastModified(), f1.lastModified()));
 
-                GridBagConstraints constraints = new GridBagConstraints();
-                constraints.gridx = 0;
-                constraints.gridy = 0;
-                constraints.insets = new Insets(10, 10, 10, 10);
+            GridBagConstraints constraints = new GridBagConstraints();
+            constraints.gridx = 0;
+            constraints.gridy = 0;
+            constraints.insets = new Insets(10, 10, 10, 10);
 
-                for (int i = 0; i < imagenes.length; i++) {
-                    ImageIcon icon = new ImageIcon(imagenes[i].getAbsolutePath());
-                    Image scaledImage = icon.getImage().getScaledInstance(200, 200, Image.SCALE_SMOOTH);
-                    JLabel label = new JLabel(new ImageIcon(scaledImage));
+            for (File imagen : imagenes) {
+                ImageIcon icon = new ImageIcon(imagen.getAbsolutePath());
+                Image scaledImage = icon.getImage().getScaledInstance(200, 200, Image.SCALE_SMOOTH);
+                JButton button = new JButton(new ImageIcon(scaledImage));
+                button.setPreferredSize(new Dimension(200, 200));
 
-                    panelPosts.add(label, constraints);
+                // Añadir un ActionListener para el botón
+                button.addActionListener(e -> {
+                    String comentario = JOptionPane.showInputDialog(this, "Ingrese su comentario:");
+                    if (comentario != null) {
+                        if (comentario.isEmpty()) {
+                            JOptionPane.showMessageDialog(this, "El comentario no puede estar vacío", "Error", JOptionPane.ERROR_MESSAGE);
+                            return;
+                        }
 
-                    if ((i + 1) % 3 == 0) {
-                        constraints.gridx = 0;
-                        constraints.gridy++;
-                    } else {
-                        constraints.gridx++;
+                        if (comentario.length() > 140) {
+                            JOptionPane.showMessageDialog(this, "El comentario no puede exceder los 140 caracteres", "Error", JOptionPane.ERROR_MESSAGE);
+                            return;
+                        }
+
+                        String fecha = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date());
+                        String nuevoComentario = Log.cuentas.getUsuario().getUsername() + " escribió:\n" + "\"" + comentario + "\" el [" + fecha + "]\n\n";
+                        
+                        // Guardar el comentario en el archivo insta.ins del usuario logueado
+                        File instaFile = new File("usuarios/" + Log.cuentas.getUsuario().getUsername() + "/insta.ins");
+                        try (BufferedWriter writer = new BufferedWriter(new FileWriter(instaFile, true))) {
+                            writer.write(nuevoComentario);
+                        } catch (IOException ex) {
+                            ex.printStackTrace();
+                        }
+
+                        // Aquí puedes añadir la lógica para actualizar la vista de comentarios si es necesario.
+                        Comentarios.cargarComentarios();
                     }
+                });
+
+                panelPosts.add(button, constraints);
+
+                if ((constraints.gridx + 1) % 3 == 0) {
+                    constraints.gridx = 0;
+                    constraints.gridy++;
+                } else {
+                    constraints.gridx++;
                 }
             }
         }
-
-        panelPosts.revalidate();
-        panelPosts.repaint();
     }
+
+    panelPosts.revalidate();
+    panelPosts.repaint();
+}
+
 }
