@@ -116,7 +116,8 @@ public class Perfil extends JPanel implements ActionListener {
             }
         }
 
-        datosTxt.setText("Followers: " + Log.cuentas.getUsuario().getCantidadFollowers() + " |  Following: " + Log.cuentas.getUsuario().getCantidadFollowing());
+        datosTxt.setText("Followers: " + Log.cuentas.getUsuario().getCantidadFollowers() + 
+                     " |  Following: " + Log.cuentas.getUsuario().getCantidadFollowing());
 
         profilePanel.revalidate();
         profilePanel.repaint();

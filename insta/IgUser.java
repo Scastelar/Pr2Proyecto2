@@ -118,24 +118,23 @@ public class IgUser implements Serializable {
                 + ", Foto: " + fotoPerfil;
     }
 
-    private int contarUsuariosEnArchivo(File archivo) {
-        int count = 0;
-        if (archivo.exists()) {
-            try (BufferedReader br = new BufferedReader(new FileReader(archivo))) {
+   private int contarUsuariosEnArchivo(File archivo) {
+    int count = 0;
+    if (archivo.exists()) {
+        try (BufferedReader br = new BufferedReader(new FileReader(archivo))) {
                 while (br.readLine() != null) {
                     count++;
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        return count;
     }
+    return count;
+}
 
     public boolean isFollowed(IgUser user) {
-        File followingFile = new File(username, "following.ins");  // Verificar el archivo "following.ins" del usuario logueado
+        File followingFile = new File(username, "following.ins");  
         List<String> siguiendo = leerUsuariosDesdeArchivo(followingFile);
-
         return siguiendo.contains(user.getUsername());
     }
 
@@ -145,7 +144,7 @@ public class IgUser implements Serializable {
             try (BufferedReader br = new BufferedReader(new FileReader(archivo))) {
                 String line;
                 while ((line = br.readLine()) != null) {
-                    usuarios.add(line);
+                    usuarios.add(line);     
                 }
             } catch (IOException e) {
                 e.printStackTrace();

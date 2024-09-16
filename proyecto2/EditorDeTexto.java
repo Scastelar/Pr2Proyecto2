@@ -1,6 +1,5 @@
 package proyecto2;
 
-
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.text.*;
@@ -15,7 +14,7 @@ public class EditorDeTexto extends JPanel {
     private JTextPane textPane;
     private JComboBox<String> fontComboBox;
     private JComboBox<Integer> sizeComboBox;
-    private JComboBox<Float> lineSpacingComboBox; // ComboBox para interlineado
+    private JComboBox<Float> lineSpacingComboBox;
     private DefaultStyledDocument doc;
     private UndoManager undoManager;
     private JPanel colorPanel;
@@ -24,7 +23,6 @@ public class EditorDeTexto extends JPanel {
     public EditorDeTexto(UserManager userManager) {
         this.userManager = userManager;
         this.currentUser = userManager.getCurrentUser();
-        setSize(900, 800);
         undoManager = new UndoManager();
         selectedColors = new ArrayList<>();
         initComponents();
@@ -36,13 +34,13 @@ public class EditorDeTexto extends JPanel {
         doc = new DefaultStyledDocument();
         textPane.setDocument(doc);
         textPane.getDocument().addUndoableEditListener(undoManager);
-        textPane.setFont(new Font("Arial", Font.PLAIN, 18));  // Fuente moderna y clara
+        textPane.setFont(new Font("Arial", Font.PLAIN, 18));
         JScrollPane scrollPane = new JScrollPane(textPane);
-
+        
         // Barra de herramientas
         JToolBar toolBar = new JToolBar();
         toolBar.setFloatable(false);
-        toolBar.setBackground(new Color(245, 245, 245)); // Fondo gris claro
+        toolBar.setBackground(new Color(245, 245, 245));
 
         // Botones estilizados con fondo blanco
         JButton cutButton = createStyledButton("Cortar", e -> new DefaultEditorKit.CutAction().actionPerformed(e));
@@ -61,7 +59,6 @@ public class EditorDeTexto extends JPanel {
             }
         });
 
-        // Botones de formato (negrita, cursiva, subrayado) con fondo blanco
         JButton boldButton = createStyledButton("B", e -> {
             Action boldAction = new StyledEditorKit.BoldAction();
             boldAction.actionPerformed(e);
@@ -119,7 +116,7 @@ public class EditorDeTexto extends JPanel {
         // ComboBox para interlineado
         Float[] lineSpacings = {1.0f, 1.5f, 2.0f}; // Valores de interlineado
         lineSpacingComboBox = new JComboBox<>(lineSpacings);
-        lineSpacingComboBox.setSelectedItem(1.0f);  // Interlineado simple por defecto
+        lineSpacingComboBox.setSelectedItem(1.0f); 
         lineSpacingComboBox.setMaximumSize(new Dimension(100, 30));
         lineSpacingComboBox.addActionListener(e -> setLineSpacing());
 
@@ -131,7 +128,6 @@ public class EditorDeTexto extends JPanel {
         // Botón para elegir color con fondo blanco
         JButton colorChooserButton = createStyledButton("Color", e -> elegirColor());
 
-        // Añadir componentes a la barra de herramientas
         toolBar.add(cutButton);
         toolBar.add(copyButton);
         toolBar.add(pasteButton);
@@ -177,7 +173,8 @@ public class EditorDeTexto extends JPanel {
         newButton.addActionListener(e -> nuevoDocumento()); // Acción para crear un nuevo documento
         bottomPanel.add(newButton);
 
-        // Añadir componentes al JFrame
+        // Añadir componentes al JPanel
+        setLayout(new BorderLayout()); // Establecer BorderLayout para el JPanel
         add(toolBar, BorderLayout.NORTH);
         add(scrollPane, BorderLayout.CENTER);
         add(bottomPanel, BorderLayout.SOUTH);
@@ -203,31 +200,7 @@ public class EditorDeTexto extends JPanel {
         doc.setParagraphAttributes(textPane.getSelectionStart(), textPane.getSelectionEnd() - textPane.getSelectionStart(), attributes, false);
     }
 
-    // Elegir color
-    private void elegirColor() {
-        Color newColor = JColorChooser.showDialog(this, "Seleccionar Color", Color.BLACK);
-        if (newColor != null) {
-            selectedColors.add(newColor);
-            actualizarPanelDeColores();
-            setTextColor(newColor);
-        }
-    }
-
-    private void actualizarPanelDeColores() {
-        colorPanel.removeAll();
-        for (Color color : selectedColors) {
-            JButton colorButton = new JButton();
-            colorButton.setBackground(color);
-            colorButton.setPreferredSize(new Dimension(30, 30));
-            colorButton.setBorder(BorderFactory.createLineBorder(Color.GRAY));
-            colorButton.addActionListener(e -> setTextColor(color));
-            colorPanel.add(colorButton);
-        }
-        colorPanel.revalidate();
-        colorPanel.repaint();
-    }
-
-    // Cambiar estilo de fuente
+    // Cambiar el estilo de fuente
     private void setFontStyle() {
         String selectedFont = (String) fontComboBox.getSelectedItem();
         int selectedSize = (Integer) sizeComboBox.getSelectedItem();
@@ -237,24 +210,36 @@ public class EditorDeTexto extends JPanel {
         doc.setCharacterAttributes(textPane.getSelectionStart(), textPane.getSelectionEnd() - textPane.getSelectionStart(), attributes, false);
     }
 
-    // Cambiar color de texto
-    private void setTextColor(Color color) {
-        SimpleAttributeSet attributes = new SimpleAttributeSet();
-        StyleConstants.setForeground(attributes, color);
-        doc.setCharacterAttributes(textPane.getSelectionStart(), textPane.getSelectionEnd() - textPane.getSelectionStart(), attributes, false);
+    // Elegir color de texto
+    private void elegirColor() {
+        Color color = JColorChooser.showDialog(this, "Elegir Color", Color.BLACK);
+        if (color != null) {
+            selectedColors.add(color);
+            colorPanel.add(createColorButton(color));
+            colorPanel.revalidate();
+            colorPanel.repaint();
+            SimpleAttributeSet attributes = new SimpleAttributeSet();
+            StyleConstants.setForeground(attributes, color);
+            doc.setCharacterAttributes(textPane.getSelectionStart(), textPane.getSelectionEnd() - textPane.getSelectionStart(), attributes, false);
+        }
     }
 
-    // Método para guardar el texto
+    // Crear un botón para el panel de colores
+    private JButton createColorButton(Color color) {
+        JButton colorButton = new JButton();
+        colorButton.setBackground(color);
+        colorButton.setPreferredSize(new Dimension(30, 30));
+        colorButton.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        return colorButton;
+    }
+
+    // Guardar el texto
     private void guardarTexto() {
-        // Aquí puedes implementar la lógica para guardar el contenido del JTextPane
-        JOptionPane.showMessageDialog(this, "El texto ha sido guardado.");
+        // Implementar la funcionalidad de guardar el texto
     }
 
-    // Método para crear un nuevo documento
+    // Crear un nuevo documento
     private void nuevoDocumento() {
-        textPane.setText("");  // Limpiar el JTextPane
-        JOptionPane.showMessageDialog(this, "Nuevo documento creado.");
+        textPane.setText("");
     }
-
-    
 }

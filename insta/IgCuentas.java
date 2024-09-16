@@ -87,14 +87,9 @@ public class IgCuentas {
         List<IgUser> usuarios = leerUsuarios();
         for (IgUser usuario : usuarios) {
             if (usuario.getUsername().equals(username) && usuario.getPassword().equals(password)) {
-                if (usuario.isActivo()) {
                     System.out.println("Inicio de sesión exitoso. Bienvenido, " + usuario.getNombre());
                     this.usuario = usuario;
                     return true;
-                } else {
-                    System.out.println("La cuenta está desactivada.");
-                    return false;
-                }
             }
         }
         System.out.println("Username o password incorrectos.");

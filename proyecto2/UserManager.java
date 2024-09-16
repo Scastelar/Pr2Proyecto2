@@ -14,7 +14,7 @@ public class UserManager {
 
     public UserManager() {
         admin = new Admin();
-        admin.createUserDirectories();  // Crear directorio del admin
+        admin.createUserDirectories();  
     }
 
     public User getCurrentUser() {
@@ -24,7 +24,7 @@ public class UserManager {
     public boolean login(String username, String password) {
         if (username.equals(admin.getUsername())) {
             if (admin.authenticate(password)) {
-                currentUser = admin;  // Establecer el usuario actual como admin
+                currentUser = admin;  
                 return true;
             }
         } else {
@@ -35,7 +35,7 @@ public class UserManager {
                     try (BufferedReader br = new BufferedReader(new FileReader(passwordFile))) {
                         String storedPassword = br.readLine();
                         if (password.equals(storedPassword)) {
-                            currentUser = new User(username, password);  // Crear una instancia del usuario actual
+                            currentUser = new User(username, password);  
                             return true;
                         }
                     } catch (FileNotFoundException e) {
