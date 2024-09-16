@@ -15,10 +15,10 @@ public class Perfil extends JPanel implements ActionListener {
     private JLabel labelFotoPerfil;
     private JTextField infoUsuario;
     private JButton botonPost;
-    static JTextField datosTxt;
+    public static JTextField datosTxt;
     private JPanel panelPosts;
-    private JPanel userInfoPanel = new JPanel();
-    static JPanel profilePanel = new JPanel();
+    JPanel userInfoPanel = new JPanel();
+    private JPanel profilePanel = new JPanel();
 
     public Perfil(InstaLogin Log) {
         this.Log = Log;
@@ -63,7 +63,6 @@ public class Perfil extends JPanel implements ActionListener {
         profilePanel.add(userInfoPanel, BorderLayout.CENTER);
         add(profilePanel, BorderLayout.NORTH);
 
-        // Panel para las imágenes
         panelPosts = new JPanel();
         panelPosts.setLayout(new GridBagLayout());
         panelPosts.setBackground(Color.WHITE);
@@ -74,7 +73,6 @@ public class Perfil extends JPanel implements ActionListener {
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         add(scrollPane, BorderLayout.CENTER);
 
-        // Botón para postear imágenes
         botonPost = new JButton("Cargar imagen");
         botonPost.setBackground(Color.black);
         botonPost.setForeground(Color.white);
@@ -93,7 +91,6 @@ public class Perfil extends JPanel implements ActionListener {
             );
 
             if (imagenes != null) {
-                // Ordenar las imágenes para que las más recientes aparezcan primero
                 java.util.Arrays.sort(imagenes, (f1, f2) -> Long.compare(f2.lastModified(), f1.lastModified()));
 
                 GridBagConstraints constraints = new GridBagConstraints();
@@ -103,7 +100,6 @@ public class Perfil extends JPanel implements ActionListener {
 
                 for (int i = 0; i < imagenes.length; i++) {
                     ImageIcon icon = new ImageIcon(imagenes[i].getAbsolutePath());
-                    // Cambiar el tamaño de las imágenes a 200x200
                     Image scaledImage = icon.getImage().getScaledInstance(300, 300, Image.SCALE_SMOOTH);
                     JLabel label = new JLabel(new ImageIcon(scaledImage));
 
@@ -131,27 +127,21 @@ public class Perfil extends JPanel implements ActionListener {
 
     // Método para subir una imagen
     private void cargarImagen() {
-        // Usamos JFileChooser para seleccionar una imagen
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         int resultado = fileChooser.showOpenDialog(this);
 
         if (resultado == JFileChooser.APPROVE_OPTION) {
             File archivoSeleccionado = fileChooser.getSelectedFile();
-
-            // Directorio donde se va a guardar la imagen
             File directorioImagenes = new File(Log.cuentas.getUsuario().getUsername(), "imagenes");
 
-            // Si el directorio no existe, lo creamos
             if (!directorioImagenes.exists()) {
                 directorioImagenes.mkdirs();  // Crea el directorio y subdirectorios necesarios
             }
 
-            // Archivo de destino con la ruta completa
             File destino = new File(directorioImagenes, archivoSeleccionado.getName());
 
             try {
-                // Copiamos la imagen a la carpeta del usuario
                 Files.copy(archivoSeleccionado.toPath(), destino.toPath(), StandardCopyOption.REPLACE_EXISTING);
                 System.out.println("Imagen subida exitosamente a: " + destino.getAbsolutePath());
                 cargarImagenesEnPanel();

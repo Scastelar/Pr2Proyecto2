@@ -89,6 +89,7 @@ public class Instagram extends JPanel implements ActionListener {
         } else if (e.getSource() == cerrar) {
             int confirm = JOptionPane.showConfirmDialog(null, "¿Estás seguro de que deseas cerrar sesión?", "Confirmar", JOptionPane.YES_NO_OPTION);
             if (confirm == JOptionPane.YES_OPTION) {
+                //Log.cuentas.setUsuario(null);
                 mainCardLayout.show(mainPanel, "logPanel");
             }
         }

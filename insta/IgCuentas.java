@@ -104,6 +104,9 @@ public class IgCuentas {
     public IgUser getUsuario() {
         return usuario;
     }
+    public void setUsuario(IgUser user) {
+        this.usuario = user;
+    }
 
 
     private List<String> leerListaDesdeArchivo(String archivoRuta) {

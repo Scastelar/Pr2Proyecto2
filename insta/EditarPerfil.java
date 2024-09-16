@@ -101,43 +101,43 @@ public class EditarPerfil extends JPanel {
     }
 
     private void mostrarUsuarios(List<IgUser> users) {
-    JPanel userPanel = new JPanel(new BorderLayout());
+        JPanel userPanel = new JPanel(new BorderLayout());
 
-    String loggedUsername = Log.cuentas.getUsuario().getUsername();
+        String loggedUsername = Log.cuentas.getUsuario().getUsername();
 
-    String[] usernames = users.stream().map(user -> {
-        if (user.getUsername().equals(loggedUsername)) {
-            return user.getUsername() + " - eres tú";
-        } else if (Log.cuentas.getUsuario().isFollowed(user)) {
-            return user.getUsername() + " - Lo sigues";
-        } else {
-            return user.getUsername() + " - No lo sigues";
-        }
-    }).toArray(String[]::new);
-
-    JList<String> userList = new JList<>(usernames);
-    userList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-    userList.addListSelectionListener(e -> {
-        if (!e.getValueIsAdjusting()) {
-            int selectedIndex = userList.getSelectedIndex();
-            if (selectedIndex != -1) {
-                mostrarPerfilUsuario(users.get(selectedIndex));
+        String[] usernames = users.stream().map(user -> {
+            if (user.getUsername().equals(loggedUsername)) {
+                return user.getUsername() + " - eres tú";
+            } else if (Log.cuentas.getUsuario().isFollowed(user)) {
+                return user.getUsername() + " - Lo sigues";
+            } else {
+                return user.getUsername() + " - No lo sigues";
             }
-        }
-    });
+        }).toArray(String[]::new);
 
-    JScrollPane scrollPane = new JScrollPane(userList);
-    userPanel.add(scrollPane, BorderLayout.CENTER);
+        JList<String> userList = new JList<>(usernames);
+        userList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        userList.addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                int selectedIndex = userList.getSelectedIndex();
+                if (selectedIndex != -1) {
+                    mostrarPerfilUsuario(users.get(selectedIndex));
+                }
+            }
+        });
 
-    contentPanel.add(userPanel, "UserList");
-    cardLayout.show(contentPanel, "UserList");
-}
+        JScrollPane scrollPane = new JScrollPane(userList);
+        userPanel.add(scrollPane, BorderLayout.CENTER);
 
+        contentPanel.add(userPanel, "UserList");
+        cardLayout.show(contentPanel, "UserList");
+    }
 
     private void mostrarPerfilUsuario(IgUser user) {
         JPanel perfilPanel = new JPanel(new BorderLayout());
         perfilPanel.setBackground(Color.white);
 
+        perfilPanel.setBackground(Color.white);
         JPanel topPanel = new JPanel();
         topPanel.setBackground(Color.white);
         topPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
@@ -151,32 +151,29 @@ public class EditarPerfil extends JPanel {
         JLabel followingLabel = new JLabel("Following: " + user.getCantidadFollowing());
 
         JButton btnSeguir = new JButton(Log.cuentas.getUsuario().isFollowed(user) ? "Dejar de seguir" : "Seguir");
-    btnSeguir.addActionListener(e -> {
-        if (Log.cuentas.getUsuario().isFollowed(user)) {
-            System.out.println("Dejar de seguir a " + user.getUsername());
-            Log.cuentas.dejarDeSeguir(Log.cuentas.getUsuario().getUsername(), user.getUsername());
-            btnSeguir.setText("Seguir");
-        } else {
-            System.out.println("Seguir a " + user.getUsername());
-            Log.cuentas.seguir(Log.cuentas.getUsuario().getUsername(), user.getUsername());
-            btnSeguir.setText("Dejar de seguir");
-        }
+        btnSeguir.addActionListener(e -> {
+            if (Log.cuentas.getUsuario().isFollowed(user)) {
+                System.out.println("Dejar de seguir a " + user.getUsername());
+                Log.cuentas.dejarDeSeguir(Log.cuentas.getUsuario().getUsername(), user.getUsername());
+                btnSeguir.setText("Seguir");
+            } else {
+                System.out.println("Seguir a " + user.getUsername());
+                Log.cuentas.seguir(Log.cuentas.getUsuario().getUsername(), user.getUsername());
+                btnSeguir.setText("Dejar de seguir");
+            }
 
-        // Actualizar las etiquetas con la nueva cantidad de seguidores y seguidos
-        followersLabel.setText("Followers: " + user.getCantidadFollowers());
-        followingLabel.setText("Following: " + user.getCantidadFollowing());
-
+            followersLabel.setText("Followers: " + user.getCantidadFollowers());
+            followingLabel.setText("Following: " + user.getCantidadFollowing());
+        Perfil.datosTxt.removeAll();
         Perfil.datosTxt.setText("Followers: " + Log.cuentas.getUsuario().getCantidadFollowers() + " |  Following: " + Log.cuentas.getUsuario().getCantidadFollowing());
-
         // Redibujar los labels para reflejar el cambio
-        Comentarios.cargarComentarios();
-        Comentarios.scrollPane.revalidate();
-        Comentarios.scrollPane.repaint();
-        Perfil.profilePanel.revalidate();
-        Perfil.profilePanel.repaint();
-        perfilPanel.revalidate();
-        perfilPanel.repaint();
-    });
+            Comentarios.cargarComentarios();
+            Comentarios.scrollPane.revalidate();
+            Comentarios.scrollPane.repaint();
+            
+            perfilPanel.revalidate();
+            perfilPanel.repaint();
+        });
 
         topPanel.add(profilePicture);
         topPanel.add(usernameLabel);
@@ -190,14 +187,22 @@ public class EditarPerfil extends JPanel {
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         add(scrollPane, BorderLayout.CENTER);
+
         perfilPanel.add(topPanel, BorderLayout.NORTH);
         perfilPanel.add(scrollPane, BorderLayout.CENTER);
         cargarImagenesEnPanel(user);
+
         if (Log.cuentas.getUsuario().getUsername().equals(user.getUsername())) {
             btnSeguir.setVisible(false);
         }
+
+        // Volver a agregar el panel al contentPanel
         contentPanel.add(perfilPanel, "PerfilUsuario");
         cardLayout.show(contentPanel, "PerfilUsuario");
+
+        // Asegurar que se refresca el contentPanel para mostrar los nuevos datos
+        contentPanel.revalidate();
+        contentPanel.repaint();
     }
 
     private void DesactivarCuenta() {
@@ -207,8 +212,29 @@ public class EditarPerfil extends JPanel {
                 Log.cuentas.getUsuario().setEstado(false);
                 actualizarUsuario(Log.cuentas.getUsuario());
                 JOptionPane.showMessageDialog(null, "Cuenta Desactivada");
+                eliminarDirectorioUsuario(Log.cuentas.getUsuario().getUsername());
                 cardLayout.show(contentPanel, "Login");
             }
+        }
+    }
+
+    private void eliminarDirectorioUsuario(String username) {
+        File directorioUsuario = new File(username);
+
+        if (directorioUsuario.exists() && directorioUsuario.isDirectory()) {
+            File[] archivos = directorioUsuario.listFiles();
+
+            if (archivos != null) {
+                for (File archivo : archivos) {
+                    archivo.delete();
+                }
+            }
+
+            directorioUsuario.delete();
+
+            System.out.println("Directorio del usuario " + username + " eliminado correctamente.");
+        } else {
+            System.out.println("El directorio del usuario no existe.");
         }
     }
 
