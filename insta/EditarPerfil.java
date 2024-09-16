@@ -1,6 +1,4 @@
 package insta;
-
-import static insta.Comentarios.scrollPane;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
@@ -196,11 +194,8 @@ public class EditarPerfil extends JPanel {
             btnSeguir.setVisible(false);
         }
 
-        // Volver a agregar el panel al contentPanel
         contentPanel.add(perfilPanel, "PerfilUsuario");
         cardLayout.show(contentPanel, "PerfilUsuario");
-
-        // Asegurar que se refresca el contentPanel para mostrar los nuevos datos
         contentPanel.revalidate();
         contentPanel.repaint();
     }

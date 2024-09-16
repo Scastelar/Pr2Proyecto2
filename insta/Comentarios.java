@@ -74,19 +74,48 @@ public class Comentarios extends JPanel {
         cargarComentarios();
     }
     
-    public static void cargarComentarios() {
-        comentariosArea.setText("");
-        List<String> comentarios = new ArrayList<>();
-        
-        cargarComentariosDesdeArchivo(instaFile, comentarios);
-        
-        cargarComentariosDeFollowing(comentarios);
-        
-        Collections.reverse(comentarios);
-        for (String comentario : comentarios) {
-            comentariosArea.append(comentario);
+    
+
+public static void cargarComentarios() {
+    comentariosArea.setText("");
+    List<String> comentarios = new ArrayList<>();
+
+    cargarComentariosDesdeArchivo(instaFile, comentarios);
+    cargarComentariosDeFollowing(comentarios);
+
+    // Ordena los comentarios por fecha
+    Collections.sort(comentarios, new Comparator<String>() {
+        SimpleDateFormat formatoFecha = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+
+        @Override
+        public int compare(String c1, String c2) {
+            try {
+                String fecha1 = extraerFecha(c1);
+                String fecha2 = extraerFecha(c2);
+
+                Date date1 = formatoFecha.parse(fecha1);
+                Date date2 = formatoFecha.parse(fecha2);
+
+                return date2.compareTo(date1);  // Compara de más reciente a menos reciente
+            } catch (Exception e) {
+                e.printStackTrace();
+                return 0;  // En caso de error, mantener el orden actual
+            }
         }
+
+        private String extraerFecha(String comentario) {
+            // Asume que la fecha está entre corchetes al final del comentario
+            int inicioFecha = comentario.indexOf("[") + 1;
+            int finFecha = comentario.indexOf("]");
+            return comentario.substring(inicioFecha, finFecha);
+        }
+    });
+
+    for (String comentario : comentarios) {
+        comentariosArea.append(comentario);
     }
+}
+
     
     private static void cargarComentariosDesdeArchivo(File file, List<String> comentarios) {
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
